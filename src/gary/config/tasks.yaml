@@ -1,17 +1,33 @@
-research_task:
+job_analysis_task:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
-  expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    Analyze the provided job description and extract key information while focusing on
+    ATS-compatible keywords and filtering out corporate jargon.
 
-reporting_task:
-  description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    **Key Instructions:**
+    - Extract concrete skills, tools, technologies, and qualifications
+    - Ignore buzzwords like "rockstar," "ninja," "synergy," "disruptive," "game-changer"
+    - Focus on specific technical skills, programming languages, tools, certifications
+    - Capture actual responsibilities and duties, not generic corporate speak
+    - Identify genuinely repeated or emphasized terms that indicate importance
+    - Extract company mission/values that are substantive, not just marketing fluff
+    - Standardize the job title to its core functional role. Remove all seniority levels, qualifiers, and program-specific tags.
+    - Strip out all terms like "1", "2", "I", "II", "Associate", "Senior" and tags like "Early Careers", "New Grad", etc from the job title.
+    - Standardize the location to the format 'City, ST, USA'.
+
+    **What to Extract:**
+    1. Company name, job title, location, job ID
+    2. Skills categorized as technical/hard, soft/interpersonal, management/leadership, bonus/nice-to-have
+    3. Specific tools and technologies mentioned
+    4. Actual responsibilities and qualifications (verbatim from job description)
+    5. Key phrases that are repeated or emphasized
+    6. Company culture keywords that describe real values/mission
+
+    Job Description:
+    ```
+    {job_description}
+    ```
+
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    A clean JSON object following the `JobAnalysis` Pydantic model. Focus on extracting
+    concrete, ATS-friendly keywords while filtering out meaningless corporate jargon.
+    Do not include any preamble or extra text outside of the JSON object.
