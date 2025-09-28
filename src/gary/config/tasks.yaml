@@ -1,26 +1,35 @@
 job_analysis_task:
     description: >
-        Analyze the provided job description and extract key information while focusing on
-        ATS-compatible keywords and filtering out corporate jargon.
+        Analyze the provided job description and extract structured information according to the JobAnalysis model.
+        Focus on ATS-compatible keywords while filtering out corporate jargon.
 
         **Key Instructions:**
-        - Extract concrete skills, tools, technologies, and qualifications
-        - Ignore buzzwords like "rockstar," "ninja," "synergy," "disruptive," "game-changer"
-        - Focus on specific technical skills, programming languages, tools, certifications
+        - Extract concrete skills, tools, technologies, qualifications, responsibilities, duties, and company culture keywords
+        - Ignore corporate jargon and buzzwords like "rockstar," "ninja," "synergy," "disruptive," "game-changer"
+        - Focus on specific technical skills, programming languages, tools, certifications and leadership/management skills
         - Capture actual responsibilities and duties, not generic corporate speak
-        - Identify genuinely repeated or emphasized terms that indicate importance
         - Extract company mission/values that are substantive, not just marketing fluff
         - Standardize the job title to its core functional role. Remove all seniority levels, qualifiers, and program-specific tags.
         - Strip out all terms like "1", "2", "I", "II", "Associate", "Senior" and tags like "Early Careers", "New Grad", etc from the job title.
         - Standardize the location to the format 'City, ST, USA'.
 
-        **What to Extract:**
-        1. Company name, job title, location, job ID
-        2. Skills categorized as technical/hard, soft/interpersonal, management/leadership, bonus/nice-to-have
-        3. Specific tools and technologies mentioned
-        4. Actual responsibilities and qualifications (verbatim from job description)
-        5. Key phrases that are repeated or emphasized
-        6. Company culture keywords that describe real values/mission
+        **Extract the following structured data:**
+
+        **1. Job Details (job_details):**
+        - company_name: The name of the hiring company
+        - job_title: The standardized job title (core functional role only)
+        - location: Location in 'City, ST, USA' format
+        - job_id: Job identifier if available (optional)
+
+        **2. Skills (skills):**
+        - technical: List of technical, hard, tools, and technologies (Python, SQL, GCP, AWS, Tableau, Power BI, Looker, etc.)
+        - soft: List of soft or interpersonal skills (communication, teamwork, etc.)
+        - management: List of management or leadership skills (cross-functional collaboration, stakeholder management, etc.)
+        - bonus: List of skills mentioned as 'plus' or 'nice-to-have'
+
+        **3. Key Terms (key_terms):**
+        - responsibilities_and_qualifications: Verbatim list of responsibilities and qualifications from the job description
+        - company_culture_keywords: Keywords related to the company's mission, culture, and values
 
         Job Description:
         ```
@@ -28,8 +37,12 @@ job_analysis_task:
         ```
 
     expected_output: >
-        A clean JSON object following the `JobAnalysis` Pydantic model. Focus on extracting
-        concrete, ATS-friendly keywords while filtering out meaningless corporate jargon.
+        A clean JSON object following the `JobAnalysis` Pydantic model structure with three main sections:
+        - job_details: Core job and company information
+        - skills: Categorized breakdown of all required skills (technical, soft, management, bonus)
+        - key_terms: Categorized breakdown of responsibilities/qualifications and company culture keywords
+
+        Focus on extracting concrete, ATS-friendly keywords while filtering out meaningless corporate jargon.
         Do not include any preamble or extra text outside of the JSON object.
 
 resume_tailoring_task:
@@ -39,16 +52,32 @@ resume_tailoring_task:
 
         **General Guidelines:**
         1. **Natural Keyword Integration:**:
-            - Strategically integrate keywords from the job analysis report throughout the resume.
-            - Focus on relevance and natural placement.
-            - Avoid "keyword stuffing"; prioritize using keywords where they will have the most impact, even if that means using a critical keyword more than once.
-        2. **Language:**
+            - Strategically integrate keywords from the job analysis report throughout the resume in a natural, contextual manner.
+            - Keywords should flow seamlessly within accomplishment statements and descriptions.
+            - Focus on relevance and natural placement where they add genuine value.
+            - Distribute keywords strategically across sections to avoid concentration in any single area.
+            
+        2. **ATS Optimization with Human Readability:**
+            - Mirror the exact language from responsibilities_and_qualifications in the job analysis to maximize ATS matching.
+            - Each responsibility/qualification from the job analysis should be reflected AT MOST ONCE across the entire resume.
+            - Track which responsibilities/qualifications you've already incorporated to avoid duplication.
+            - Balance ATS optimization with compelling human-readable content.
+            
+        3. **Keyword Distribution Strategy:**
+            - Avoid keyword stuffing by using each critical keyword 1-3 times maximum across the entire resume.
+            - Prioritize keyword placement in order: Professional Summary > Most Recent Role > Projects > Earlier Roles.
+            - Use variations and synonyms where appropriate to demonstrate depth without repetition.
+            - Never force keywords where they don't naturally fit the context.
+            
+        4. **Language:**
             - Avoid filler or corporate buzzwords (e.g., synergy, go-getter, visionary).
             - Use precise, action-oriented language tied to measurable outcomes.
-        3. **Authenticity:**
+            
+        5. **Authenticity:**
             - Only use experiences, achievements, and skills present in the master resume.
             - You may rephrase or highlight content but must not fabricate information.
-        4. **Scope**:
+            
+        6. **Scope**:
             - Modify only the following sections: Professional Summary, Work Experience, Education, Projects, Skills.
             - Do not add extra sections.
 
@@ -58,54 +87,65 @@ resume_tailoring_task:
         1. Write a compelling summary between 70-100 words.
         2. Begin with the job title from the job analysis, followed by the candidate's years of experience.
         3. Highlight 1-2 core areas of expertise that directly align with the job's primary responsibilities.
-        4. Conclude with a significant, quantified achievement that showcases proficiency with a key tool or technology mentioned in the analysis.
-        5. Mention key tools, technologies, or skills from the job analysis in a natural way.
-        6. Use a tone aligned with the job responsibilities (e.g., collaborative, innovative, detail-oriented).
-        7. If company mission/values are present in the job analysis, use them to express your commitment to staying up-to-date with the industry, since tech roles often require evolving skill sets.
-        8. Do not mention the company name in the summary.
+        4. Mirror 2-3 high-priority responsibilities/qualifications from the job analysis using exact or very similar phrasing.
+        5. Conclude with a significant, quantified achievement that showcases proficiency with a key tool or technology mentioned in the analysis.
+        6. Mention key tools, technologies, or skills from the job analysis in a natural way.
+        7. Use a tone aligned with the job responsibilities (e.g., collaborative, innovative, detail-oriented).
+        8. If company mission/values are present in the job analysis, use them to express your commitment to staying up-to-date with the industry.
+        9. Do not mention the company name in the summary.
+        10. Track which responsibilities/qualifications you use here to avoid repeating them elsewhere.
 
         **B) Work Experience:**
         1. Update the title of the most recent role to match the job title from the job analysis. Do not change earlier roles.
         2. For each role, select the 5 most relevant bullet points from the master resume that directly and/or indirectly align with the responsibilities in the job analysis.
         3. Rewrite each bullet point in the result-oriented format:
             - Accomplished [X] by doing [Z], resulting in [Y].
+            - Each bullet should mirror ONE unique responsibility/qualification from the job analysis that hasn't been used elsewhere.
+            - Incorporate the exact phrasing or very close variations of responsibilities/qualifications.
             - Incorporate a quantifiable metric (e.g., percentages, dollar amounts, time saved) where possible to demonstrate tangible results.
-            - Seamlessly integrate relevant keywords and skills from the job analysis. Rephrase existing skills to match the terminology of the target role where appropriate.
         4. Begin each bullet with a unique, strong action verb. Do not repeat verbs within the same role.
-        5. Incorporate keywords and skills from the job analysis naturally.
-            - If a master resume skill is similar to one in the job analysis, rephrase it as a transferable skill aligned to the target role.
-        6. Ensure bullet points directly reflect responsibilities and duties from the job analysis.
+        5. Distribute different responsibilities/qualifications across roles - don't concentrate all matching in one position.
+        6. For the most recent role, prioritize the most critical responsibilities from the job analysis.
+        7. For earlier roles, use complementary responsibilities that support but don't duplicate the recent role's focus.
+        8. Ensure bullet points directly reflect responsibilities and duties from the job analysis without over-repetition.
 
         **C) Education:**
         1. For each degree, list up to 5 relevant courses.
         2. Select only courses that are directly related to keywords, skills, or responsibilities from the job analysis.
-        3. Do not list unrelated or filler coursework.
+        3. Course names can subtly reinforce keywords without duplicating exact responsibility phrases used elsewhere.
+        4. Do not list unrelated or filler coursework.
 
         **D) Projects:**
         1. For each project, expand the description to include:
-            - Goal/Purpose of the project.
-            - Technologies/Tools used (prioritize those from the job analysis).
-            - Impact or outcome of the project.
+            - Goal/Purpose of the project aligned with responsibilities not yet covered in work experience.
+            - Technologies/Tools used (prioritize those from the job analysis not heavily featured elsewhere).
+            - Impact or outcome that demonstrates competency in a unique responsibility/qualification.
         2. Keep each description under 3 sentences.
-        3. Emphasize alignment with the target job's duties and responsibilities.
+        3. Use projects to cover any remaining high-priority responsibilities/qualifications not addressed in other sections.
+        4. Emphasize alignment with the target job's duties and responsibilities using varied language.
 
         **E) Skills:**
         1. Include only technical/hard skills and methodologies (e.g., Programming Languages, Frameworks, Databases, Tools, SDLC, TDD, Agile).
         2. Retain all existing technical skills from the master resume.
         3. Remove soft skills (e.g., communication, teamwork, leadership) if present.
         4. Add technical skills from the job analysis where relevant.
-        5. Organize skills under clear categories, for example:
+        5. This section should comprehensively list all technical keywords without narrative repetition.
+        6. Organize skills under clear categories, for example:
             - Programming Languages
-            - Frameworks and libraries
+            - Frameworks and Libraries
             - Databases
             - Tools and Platforms
             - Methodologies
 
+        **Quality Check Before Finalizing:**
+        - Verify each responsibility/qualification from the job analysis appears at most once across all sections.
+        - Ensure critical keywords appear 1-3 times maximum throughout the resume.
+        - Confirm the resume reads naturally to a human while containing ATS-friendly keywords.
+        - Check that keyword placement feels organic and adds value to the content.
+
         **Master Resume:**
         ```json
         {master_resume}
-        ```
-
     expected_output: >
         A single, clean JSON object that strictly adheres to the `Resume` Pydantic model.
         Do not include any introductory text, explanations, or any content outside of the final JSON object.

@@ -20,7 +20,7 @@ class Skills(BaseModel):
 
     technical: List[str] = Field(
         default=[],
-        description="List of technical or hard skills like Python, SQL, GCP, AWS, etc.",
+        description="List of technical, hard, tools, and technologies like Python, SQL, GCP, AWS, Tableau, Power BI, Looker, etc.",
     )
     soft: List[str] = Field(
         default=[],
@@ -34,9 +34,16 @@ class Skills(BaseModel):
         default=[],
         description="List of skills mentioned as a 'plus' or 'nice-to-have'.",
     )
-    tools_and_technologies: List[str] = Field(
-        default=[],
-        description="Specific software, platforms, or tools mentioned like Tableau, Power BI, Looker, etc.",
+
+class KeyTerms(BaseModel):
+    """Structured model for key terms."""
+    responsibilities_and_qualifications: List[str] = Field(
+        ...,
+        description="A verbatim list of responsibilities and qualifications from the job description like Responsibilities, Qualifications, Duties, etc.",
+    )
+    company_culture_keywords: List[str] = Field(
+        ...,
+        description="Keywords related to the company's mission, culture, and values like Mission, Vision, Values, etc.",
     )
 
 
@@ -49,17 +56,9 @@ class JobAnalysis(BaseModel):
     skills: Skills = Field(
         ..., description="A categorized breakdown of all required skills."
     )
-    responsibilities_and_qualifications: List[str] = Field(
+    key_terms: KeyTerms = Field(
         ...,
-        description="A verbatim list of responsibilities and qualifications from the job description like Responsibilities, Qualifications, Duties, etc.",
-    )
-    key_phrases: List[str] = Field(
-        default=[],
-        description="List of important or frequently repeated phrases indicating priority.",
-    )
-    company_culture_keywords: List[str] = Field(
-        default=[],
-        description="Keywords related to the company's mission, culture, and values like Mission, Vision, Values, etc.",
+        description="A categorized breakdown of all required key terms.",
     )
 
 

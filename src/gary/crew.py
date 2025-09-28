@@ -1,43 +1,14 @@
 import os
-import logging
 from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Optional
 from src.gary.models import JobAnalysis, Resume
 
-# Configure logging
-logger = logging.getLogger(__name__)
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL")
 
-
-class LLMConfigurationError(Exception):
-    """Exception raised when LLM configuration fails."""
-
-    pass
-
-
-class CrewInitializationError(Exception):
-    """Exception raised when crew initialization fails."""
-
-    pass
-
-
-def validate_environment() -> None:
-    """Validate required environment variables."""
-    if not OPENROUTER_API_KEY:
-        raise LLMConfigurationError(
-            "OPENROUTER_API_KEY environment variable is not set"
-        )
-
-    if not OPENROUTER_BASE_URL:
-        raise LLMConfigurationError(
-            "OPENROUTER_BASE_URL environment variable is not set"
-        )
-
-    logger.info("Environment variables validated successfully")
 
 
 def llm_config(model: str, temperature: float) -> LLM:
@@ -55,7 +26,6 @@ def llm_config(model: str, temperature: float) -> LLM:
         LLMConfigurationError: If LLM configuration fails
     """
     try:
-        validate_environment()
 
         llm = LLM(
             model=model,
@@ -63,13 +33,10 @@ def llm_config(model: str, temperature: float) -> LLM:
             api_key=OPENROUTER_API_KEY,
             base_url=OPENROUTER_BASE_URL,
         )
-
-        logger.info(f"LLM configured successfully with model: {model}")
         return llm
 
     except Exception as e:
-        logger.error(f"Failed to configure LLM: {e}")
-        raise LLMConfigurationError(f"Failed to configure LLM: {e}")
+        raise Exception(f"Failed to configure LLM: {e}")
 
 
 @CrewBase
@@ -85,7 +52,7 @@ class Gary:
             config=self.agents_config["job_analyst"],
             verbose=True,
             llm=llm_config(
-                "openrouter/x-ai/grok-4-fast:free", 0.1
+                "openrouter/anthropic/claude-sonnet-4", 0.1
             ),
             max_iter=3,
             allow_delegation=False,
