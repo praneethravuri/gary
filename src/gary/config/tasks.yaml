@@ -137,11 +137,17 @@ resume_tailoring_task:
             - Tools and Platforms
             - Methodologies
 
+        **Content Integration Marking:**
+        - Mark ALL integrated content from the job analysis in **markdown bold** format.
+        - This includes: responsibilities, qualifications, skills, tools, technologies, and company culture keywords.
+        - Use **bold** to highlight exact phrases or close variations that come from the job analysis.
+
         **Quality Check Before Finalizing:**
         - Verify each responsibility/qualification from the job analysis appears at most once across all sections.
         - Ensure critical keywords appear 1-3 times maximum throughout the resume.
         - Confirm the resume reads naturally to a human while containing ATS-friendly keywords.
         - Check that keyword placement feels organic and adds value to the content.
+        - Verify that all integrated content from the job analysis is properly marked in **bold**.
 
         **Master Resume:**
         ```json
@@ -149,3 +155,127 @@ resume_tailoring_task:
     expected_output: >
         A single, clean JSON object that strictly adheres to the `Resume` Pydantic model.
         Do not include any introductory text, explanations, or any content outside of the final JSON object.
+
+resume_refinement_task:
+    description: >
+        Review and refine the tailored resume to ensure it sounds authentically human while 
+        maintaining ATS optimization. Apply all refinement guidelines to create a polished, 
+        professional document that balances keyword optimization with natural readability.
+
+        **Core Refinement Guidelines:**
+
+        **1. Length Constraints (STRICT):**
+        - Professional Summary: Maximum 100 words (count every word)
+        - Bullet Points: 15-25 words each (strictly enforced)
+        - If content exceeds limits, prioritize impact and cut filler
+
+        **2. Preserve Critical Elements:**
+        - NEVER modify or remove **bold formatted** keywords/phrases
+        - These bolded terms are ATS-critical and must remain exactly as marked
+        - You may rewrite around them but the bold text itself stays unchanged
+
+        **3. Language Naturalization:**
+        - Eliminate AI patterns: "leveraged", "spearheaded", "utilizing", "furthermore"
+        - Remove redundant phrases: "successfully completed" → "completed"
+        - Cut unnecessary adverbs: "effectively managed" → "managed"
+        - Replace generic terms with industry-specific language
+        - Vary sentence beginnings (not every bullet starts with past-tense verb)
+
+        **4. Active Voice Transformation:**
+        - Identify all passive constructions and rewrite with strong action verbs
+        - Examples:
+          * "Was responsible for..." → "Managed..."
+          * "Tasks were completed..." → "Completed tasks..."
+          * "Improvements were implemented..." → "Implemented improvements..."
+
+        **5. Quantifiable Impact Refinement:**
+        - Limit to 1-2 metrics per bullet point (remove excess numbers)
+        - Professional Summary: Maximum 1 quantified achievement
+        - Choose the most impressive metric when multiple exist
+        - Format consistently: Use % for percentages, K/M for thousands/millions
+
+        **6. Sentence Structure Variation:**
+        - Mix short (10-15 words) and longer (20-25 words) bullet points
+        - Occasionally start with results: "Reduced costs 30% by..."
+        - Use participial phrases sparingly: "Working with cross-functional teams..."
+        - Include time-based achievements: "In 6 months, achieved..."
+
+        **7. Human Voice Techniques:**
+        - Add transitional phrases that humans use: "Additionally", "As a result"
+        - Include industry colloquialisms where appropriate
+        - Use contractions sparingly in less formal contexts
+        - Vary verb tenses appropriately (past for previous roles, present for current)
+
+        **8. Consistency Checks:**
+        - Formatting: Ensure uniform bullet point style (periods or no periods)
+        - Capitalization: Consistent approach to job titles, technologies
+        - Punctuation: Check for Oxford commas, semicolon usage
+        - Date formats: Ensure all dates follow same pattern (MM/YYYY or Month YYYY)
+
+        **9. Flow and Readability:**
+        - Read each section aloud to catch awkward phrasing
+        - Ensure smooth transitions between bullet points
+        - Create narrative coherence within each role
+        - Avoid starting consecutive bullets with the same word
+
+        **10. Final Polish:**
+        - Remove all instances of corporate buzzwords: synergy, leverage, utilize
+        - Eliminate redundant qualifiers: "very", "extremely", "highly"
+        - Check spelling and grammar meticulously
+        - Ensure industry terms are used correctly and naturally
+
+        **Section-Specific Refinement:**
+
+        **Professional Summary:**
+        - First sentence: Role + years of experience (natural phrasing)
+        - Middle: 2-3 key strengths written conversationally
+        - Last sentence: One impressive achievement with metric
+        - Total word count: 70-100 words maximum
+        - Write as a cohesive paragraph, not disconnected statements
+
+        **Work Experience:**
+        - Vary bullet point lengths within the 15-25 word range
+        - Create logical flow from strategic to tactical achievements
+        - Use different action verbs for each bullet (no repetition within role)
+        - Include context where needed: "During peak season, managed..."
+        - Balance technical achievements with business impact
+
+        **Projects:**
+        - Write in narrative style, not bullet points
+        - Focus on problem-solution-result structure
+        - Keep descriptions conversational yet professional
+        - Maximum 3 sentences per project
+
+        **Education:**
+        - List courses naturally: "Relevant coursework includes..."
+        - Use course names that sound academic, not keyword-stuffed
+
+        **Skills:**
+        - Organize logically with clear categories
+        - Use industry-standard names for technologies
+        - Avoid redundancy (don't list Python and Python 3.x)
+
+        **Quality Assurance Checklist:**
+        ✓ All bullet points between 15-25 words
+        ✓ Professional summary under 100 words
+        ✓ No passive voice constructions
+        ✓ Bold formatting preserved exactly
+        ✓ Maximum 2 metrics per bullet point
+        ✓ No repeated action verbs within sections
+        ✓ Varied sentence structures
+        ✓ No AI-pattern words or corporate jargon
+        ✓ Natural, human-sounding language throughout
+        ✓ Consistent formatting and punctuation
+
+    expected_output: >
+        A refined JSON resume following the exact Resume model structure that:
+        - Sounds genuinely human-written with natural language flow
+        - Maintains all **bold** keyword formatting without modification
+        - Adheres strictly to word count limits (summary ≤100 words, bullets 15-25 words)
+        - Contains no passive voice, AI patterns, or corporate jargon
+        - Features varied sentence structures and industry-authentic language
+        - Includes 1-2 quantifiable metrics per bullet point maximum
+        - Demonstrates perfect consistency in formatting and style
+        - Reads smoothly when spoken aloud
+
+        Output only the refined JSON object with no additional text or explanation.

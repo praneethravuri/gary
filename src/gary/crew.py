@@ -52,7 +52,7 @@ class Gary:
             config=self.agents_config["job_analyst"],
             verbose=True,
             llm=llm_config(
-                "openrouter/anthropic/claude-sonnet-4", 0.1
+                "openrouter/deepseek/deepseek-chat-v3-0324", 0.1
             ),
             max_iter=3,
             allow_delegation=False,
@@ -64,11 +64,13 @@ class Gary:
             config=self.agents_config["resume_tailorer"],
             verbose=True,
             llm=llm_config(
-                "openrouter/anthropic/claude-sonnet-4", 0.4
+                "openrouter/google/gemini-2.5-flash", 0.4
             ),
             max_iter=5,
             allow_delegation=False,
         )
+
+    
 
     @task
     def job_analysis_task(self) -> Task:
