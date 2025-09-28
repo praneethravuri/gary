@@ -256,16 +256,16 @@ resume_refinement_task:
         - Avoid redundancy (don't list Python and Python 3.x)
 
         **Quality Assurance Checklist:**
-        ✓ All bullet points between 15-25 words
-        ✓ Professional summary under 100 words
-        ✓ No passive voice constructions
-        ✓ Bold formatting preserved exactly
-        ✓ Maximum 2 metrics per bullet point
-        ✓ No repeated action verbs within sections
-        ✓ Varied sentence structures
-        ✓ No AI-pattern words or corporate jargon
-        ✓ Natural, human-sounding language throughout
-        ✓ Consistent formatting and punctuation
+        - All bullet points between 15-25 words
+        - Professional summary under 100 words
+        - No passive voice constructions
+        - Bold formatting preserved exactly
+        - Maximum 2 metrics per bullet point
+        - No repeated action verbs within sections
+        - Varied sentence structures
+        - No AI-pattern words or corporate jargon
+        - Natural, human-sounding language throughout
+        - Consistent formatting and punctuation
 
     expected_output: >
         A refined JSON resume following the exact Resume model structure that:
