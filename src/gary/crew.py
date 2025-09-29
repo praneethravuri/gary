@@ -4,7 +4,6 @@ from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Optional
 from src.gary.models import JobAnalysis, ResumeContent
-from src.gary.tools.word_resume_generator import WordResumeGeneratorTool
 
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
@@ -81,7 +80,6 @@ class Gary:
             ),
             max_iter=3,
             allow_delegation=False,
-            tools=[WordResumeGeneratorTool()]
         )
 
     @task

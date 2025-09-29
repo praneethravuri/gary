@@ -4,6 +4,7 @@ from typing import List, Optional
 from google.oauth2.service_account import Credentials
 from dotenv import load_dotenv
 from gary.models import JobDetails
+from gary.utils.clean_job_description import clean_job_description
 
 load_dotenv()
 
@@ -88,6 +89,23 @@ class GoogleSheetsClient:
 
         return self.worksheet.row_values(row_number)
 
+    def update_cell(self, row: int, col: int, value: str) -> None:
+        """
+        Update a specific cell in the worksheet.
+
+        Args:
+            row: Row number (1-indexed)
+            col: Column number (1-indexed)
+            value: Value to set in the cell
+
+        Raises:
+            ValueError: If no worksheet is connected
+        """
+        if not self.worksheet:
+            raise ValueError("No worksheet connected. Call connect_to_sheet() first.")
+
+        self.worksheet.update_cell(row, col, value)
+
     def process_ungenerated_resumes(self) -> List[JobDetails]:
         """
         Process rows where "Resume Generated" column is empty.
@@ -139,7 +157,7 @@ class GoogleSheetsClient:
                     job_title=row[1] if len(row) > 1 else "",
                     location=row[2] if len(row) > 2 else "",
                     job_id=row[3] if len(row) > 3 and row[3] else None,
-                    job_description=row[4] if len(row) > 4 else ""
+                    job_description= clean_job_description(row[4]) if len(row) > 4 else ""
                 )
 
                 job_details_list.append(job_details)

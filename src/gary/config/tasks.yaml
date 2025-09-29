@@ -261,9 +261,6 @@ resume_refinement_task:
         - Natural, human-sounding language throughout
         - Consistent formatting and punctuation
 
-        **IMPORTANT: After completing the refinement, you MUST call the Word Resume Generator tool 
-        to create the final Word document. Pass the refined resume data to the tool.**
-
     expected_output: >
         A refined JSON resume following the exact Resume model structure that:
         - Sounds genuinely human-written with natural language flow
@@ -274,6 +271,3 @@ resume_refinement_task:
         - Includes 1-2 quantifiable metrics per bullet point maximum
         - Demonstrates perfect consistency in formatting and style
         - Reads smoothly when spoken aloud
-        
-        Additionally, a Word document (.docx) file must be generated using the Word Resume Generator tool.
-        The task is only complete when both the refined JSON resume AND the Word document are produced.
