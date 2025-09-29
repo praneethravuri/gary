@@ -1,6 +1,6 @@
 import gspread
 import os
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from google.oauth2.service_account import Credentials
 from dotenv import load_dotenv
 from gary.models import JobDetails
@@ -106,68 +106,45 @@ class GoogleSheetsClient:
 
         self.worksheet.update_cell(row, col, value)
 
-    def process_ungenerated_resumes(self) -> List[JobDetails]:
+    def get_last_row_as_job_details(self) -> Tuple[int, JobDetails]:
         """
-        Process rows where "Resume Generated" column is empty.
-        Creates JobDetails objects from the row data and updates "Resume Generated" to "done".
+        Get the last row from the worksheet (cells 1-5) and return as JobDetails.
 
         Returns:
-            List of JobDetails objects for unprocessed rows
+            Tuple of (row_number, JobDetails model)
 
         Raises:
-            ValueError: If no worksheet is connected or required columns not found
+            ValueError: If no worksheet is connected or insufficient data
         """
         if not self.worksheet:
             raise ValueError("No worksheet connected. Call connect_to_sheet() first.")
 
         all_rows = self.worksheet.get_all_values()
 
-        if len(all_rows) < 1:
-            raise ValueError("Worksheet has no data")
+        if not all_rows:
+            raise ValueError("Worksheet is empty")
 
-        # Get headers and find column indices
-        headers = all_rows[0]
+        last_row = all_rows[-1]
+        last_row_number = len(all_rows)
 
-        # Create a mapping of header names to indices
-        header_map = {header: idx for idx, header in enumerate(headers)}
+        if len(last_row) < 5:
+            raise ValueError(f"Last row has only {len(last_row)} cells, need at least 5")
 
-        # Find required column indices
-        try:
-            resume_gen_col_idx = header_map["Resume Generated"]
-        except KeyError:
-            raise ValueError("Column 'Resume Generated' not found in headers")
+        # Extract first 5 cells
+        company_name, job_title, location, job_id, job_description = last_row[:5]
 
-        job_details_list = []
+        # Create JobDetails instance
+        job_details = JobDetails(
+            company_name=company_name,
+            job_title=job_title,
+            location=location,
+            job_id=job_id if job_id else None,
+            job_description=clean_job_description(job_description),
+        )
 
-        # Process rows 2 onwards (skip header row)
-        for row_idx, row in enumerate(all_rows[1:], start=2):  # start=2 for 1-indexed row numbers
-            # Extend row if it's shorter than expected
-            while len(row) <= resume_gen_col_idx:
-                row.append("")
+        return last_row_number, job_details
 
-            # Check if "Resume Generated" is empty
-            if not row[resume_gen_col_idx].strip():
-                # Print columns 1-5 (indices 0-4)
-                print(f"Row {row_idx}: {row[:5]}")
 
-                # Create JobDetails object from row data
-                # Assuming columns are: company_name, job_title, location, job_id, job_description
-                job_details = JobDetails(
-                    company_name=row[0] if len(row) > 0 else "",
-                    job_title=row[1] if len(row) > 1 else "",
-                    location=row[2] if len(row) > 2 else "",
-                    job_id=row[3] if len(row) > 3 and row[3] else None,
-                    job_description= clean_job_description(row[4]) if len(row) > 4 else ""
-                )
-
-                job_details_list.append(job_details)
-                print(f"Created JobDetails: {job_details.model_dump()}")
-
-                # Update "Resume Generated" cell to "done"
-                # Column is 1-indexed in gspread
-                self.worksheet.update_cell(row_idx, resume_gen_col_idx + 1, "done")
-
-        return job_details_list
     
 sheets_client = GoogleSheetsClient("googleSheetsCredentials.json")
 sheet_id = os.getenv("GOOGLE_SHEETS_ID")
@@ -175,6 +152,5 @@ if sheet_id:
     sheets_client.connect_to_sheet(sheet_id)
     # all_rows = sheets_client.get_all_rows()
     # print(all_rows)
-    sheets_client.process_ungenerated_resumes()
 else:
     print("GOOGLE_SHEETS_ID not found in environment variables")

@@ -110,13 +110,14 @@ class Link(BaseModel):
     url: str = Field(..., description="Platform URL")
 
 
-class ContactInfo(BaseModel):
+class Header(BaseModel):
     name: str = Field(..., description="Name")
     phone: str = Field(..., description="Phone number")
     email: EmailStr = Field(..., description="Email address")
     links: List[Link] = Field(..., description="Links")
+    location: str = Field(..., description="Location")
 
 
 class Resume(BaseModel):
-    contact_info: ContactInfo = Field(..., description="Contact information")
+    header: Header = Field(..., description="Contact information")
     resume_content: ResumeContent = Field(..., description="Resume content")
