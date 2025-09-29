@@ -6,6 +6,7 @@ from gary.utils.read_json import read_header_json, read_resume_json
 from gary.models import Resume, ResumeContent
 from gary.utils.resume_word_doc_generator import generate_word_resume
 from gary.utils.google_sheets import initialize_sheets_client
+from gary.utils.result_parser import parse_crew_result
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
@@ -36,17 +37,8 @@ def run() -> None:
         header = read_header_json()
         header.location = job_details.location
 
-        # Extract data from CrewOutput object
-        import json
-        if hasattr(result, 'raw'):
-            result_data = json.loads(result.raw)
-        elif isinstance(result, str):
-            result_data = json.loads(result)
-        elif isinstance(result, dict):
-            result_data = result
-        else:
-            result_data = result
-
+        # Parse CrewAI result
+        result_data = parse_crew_result(result)
         resume_content = ResumeContent(**result_data)
         final_resume = Resume(header=header, resume_content=resume_content)
 

@@ -1,9 +1,6 @@
 import re
 import unicodedata
-from typing import Optional, List
-import json
-from pydantic import BaseModel
-from src.gary.models import JobDetails
+
 
 def clean_job_description(text: str) -> str:
     """

@@ -1,13 +1,15 @@
 import os
 import gspread
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from google.oauth2.service_account import Credentials
 from gary.models import JobDetails
 from gary.utils.clean_job_description import clean_job_description
+from gary.config import DEFAULT_WORKSHEET_NAME, CREDENTIALS_FILE
+from gary.exceptions import GoogleSheetsError
 
 
 class GoogleSheetsClient:
-    def __init__(self, credentials_file: str = "googleSheetsCredentials.json"):
+    def __init__(self, credentials_file: str = CREDENTIALS_FILE):
         """
         Initialize Google Sheets client with service account credentials.
 
@@ -42,13 +44,13 @@ class GoogleSheetsClient:
         Extract all rows from the connected worksheet.
 
         Returns:
-            List of lists containing all row data
+            List[List[str]]: List of lists containing all row data
 
         Raises:
-            ValueError: If no worksheet is connected
+            GoogleSheetsError: If no worksheet is connected
         """
         if not self.worksheet:
-            raise ValueError("No worksheet connected. Call connect_to_sheet() first.")
+            raise GoogleSheetsError("No worksheet connected. Call connect_to_sheet() first.")
 
         return self.worksheet.get_all_values()
 
@@ -58,13 +60,13 @@ class GoogleSheetsClient:
         Uses first row as headers.
 
         Returns:
-            List of dictionaries with column headers as keys
+            List[dict]: List of dictionaries with column headers as keys
 
         Raises:
-            ValueError: If no worksheet is connected
+            GoogleSheetsError: If no worksheet is connected
         """
         if not self.worksheet:
-            raise ValueError("No worksheet connected. Call connect_to_sheet() first.")
+            raise GoogleSheetsError("No worksheet connected. Call connect_to_sheet() first.")
 
         return self.worksheet.get_all_records()
 
@@ -76,13 +78,13 @@ class GoogleSheetsClient:
             row_number: Row number (1-indexed)
 
         Returns:
-            List of values in the specified row
+            List[str]: List of values in the specified row
 
         Raises:
-            ValueError: If no worksheet is connected
+            GoogleSheetsError: If no worksheet is connected
         """
         if not self.worksheet:
-            raise ValueError("No worksheet connected. Call connect_to_sheet() first.")
+            raise GoogleSheetsError("No worksheet connected. Call connect_to_sheet() first.")
 
         return self.worksheet.row_values(row_number)
 
@@ -96,10 +98,10 @@ class GoogleSheetsClient:
             value: Value to set in the cell
 
         Raises:
-            ValueError: If no worksheet is connected
+            GoogleSheetsError: If no worksheet is connected
         """
         if not self.worksheet:
-            raise ValueError("No worksheet connected. Call connect_to_sheet() first.")
+            raise GoogleSheetsError("No worksheet connected. Call connect_to_sheet() first.")
 
         self.worksheet.update_cell(row, col, value)
 
@@ -111,40 +113,45 @@ class GoogleSheetsClient:
             Tuple of (row_number, JobDetails model)
 
         Raises:
-            ValueError: If no worksheet is connected or insufficient data
+            GoogleSheetsError: If no worksheet is connected, worksheet is empty, or insufficient data
         """
-        if not self.worksheet:
-            raise ValueError("No worksheet connected. Call connect_to_sheet() first.")
+        try:
+            if not self.worksheet:
+                raise GoogleSheetsError("No worksheet connected. Call connect_to_sheet() first.")
 
-        all_rows = self.worksheet.get_all_values()
+            all_rows = self.worksheet.get_all_values()
 
-        if not all_rows:
-            raise ValueError("Worksheet is empty")
+            if not all_rows:
+                raise GoogleSheetsError("Worksheet is empty")
 
-        last_row = all_rows[-1]
-        last_row_number = len(all_rows)
+            last_row = all_rows[-1]
+            last_row_number = len(all_rows)
 
-        if len(last_row) < 5:
-            raise ValueError(f"Last row has only {len(last_row)} cells, need at least 5")
+            if len(last_row) < 5:
+                raise GoogleSheetsError(f"Last row has only {len(last_row)} cells, need at least 5")
 
-        # Extract first 5 cells
-        company_name, job_title, location, job_id, job_description = last_row[:5]
+            # Extract first 5 cells
+            company_name, job_title, location, job_id, job_description = last_row[:5]
 
-        # Create JobDetails instance
-        job_details = JobDetails(
-            company_name=company_name,
-            job_title=job_title,
-            location=location,
-            job_id=job_id if job_id else None,
-            job_description=clean_job_description(job_description),
-        )
+            # Create JobDetails instance
+            job_details = JobDetails(
+                company_name=company_name,
+                job_title=job_title,
+                location=location,
+                job_id=job_id if job_id else None,
+                job_description=clean_job_description(job_description),
+            )
 
-        return last_row_number, job_details
+            return last_row_number, job_details
+        except Exception as e:
+            if isinstance(e, GoogleSheetsError):
+                raise
+            raise GoogleSheetsError(f"Failed to retrieve job details: {e}") from e
 
 
 def initialize_sheets_client(
-    credentials_file: str = "googleSheetsCredentials.json",
-    worksheet_name: str = "Sheet1"
+    credentials_file: str = CREDENTIALS_FILE,
+    worksheet_name: str = DEFAULT_WORKSHEET_NAME
 ) -> GoogleSheetsClient:
     """
     Initialize and connect Google Sheets client.
@@ -157,12 +164,17 @@ def initialize_sheets_client(
         Connected GoogleSheetsClient instance
 
     Raises:
-        ValueError: If GOOGLE_SHEETS_ID not found in environment variables
+        GoogleSheetsError: If GOOGLE_SHEETS_ID not found or connection fails
     """
-    sheet_id = os.getenv("GOOGLE_SHEETS_ID")
-    if not sheet_id:
-        raise ValueError("GOOGLE_SHEETS_ID not found in environment variables")
+    try:
+        sheet_id = os.getenv("GOOGLE_SHEETS_ID")
+        if not sheet_id:
+            raise GoogleSheetsError("GOOGLE_SHEETS_ID not found in environment variables")
 
-    client = GoogleSheetsClient(credentials_file)
-    client.connect_to_sheet(sheet_id, worksheet_name)
-    return client
+        client = GoogleSheetsClient(credentials_file)
+        client.connect_to_sheet(sheet_id, worksheet_name)
+        return client
+    except Exception as e:
+        if isinstance(e, GoogleSheetsError):
+            raise
+        raise GoogleSheetsError(f"Failed to initialize Google Sheets client: {e}") from e

@@ -1,11 +1,7 @@
 import json
-import os
-from pathlib import Path
 from gary.models import ResumeContent, Header
-
-PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
-RESUME_PATH = PROJECT_ROOT / "data" / "resume.json"
-HEADER_PATH = PROJECT_ROOT / "data" / "header.json"
+from gary.config import HEADER_PATH, RESUME_PATH
+from gary.exceptions import DataLoadError
 
 
 def read_header_json() -> Header:
@@ -16,16 +12,20 @@ def read_header_json() -> Header:
         Header: Parsed header data
 
     Raises:
-        FileNotFoundError: If header.json does not exist
-        ValueError: If JSON is invalid or doesn't match schema
+        DataLoadError: If header.json does not exist, is invalid, or doesn't match schema
     """
-    if not os.path.exists(HEADER_PATH):
-        raise FileNotFoundError(f"header.json not found at {HEADER_PATH}")
+    try:
+        if not HEADER_PATH.exists():
+            raise DataLoadError(f"header.json not found at {HEADER_PATH}")
 
-    with open(HEADER_PATH, "r", encoding="utf-8") as f:
-        data = json.load(f)
+        with open(HEADER_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
 
-    return Header(**data)
+        return Header(**data)
+    except (json.JSONDecodeError, ValueError) as e:
+        raise DataLoadError(f"Failed to parse header.json: {e}") from e
+    except Exception as e:
+        raise DataLoadError(f"Failed to read header.json: {e}") from e
 
 
 def read_resume_json() -> ResumeContent:
@@ -36,15 +36,17 @@ def read_resume_json() -> ResumeContent:
         ResumeContent: Parsed resume data
 
     Raises:
-        FileNotFoundError: If resume.json does not exist
-        ValueError: If JSON is invalid or doesn't match schema
+        DataLoadError: If resume.json does not exist, is invalid, or doesn't match schema
     """
-    # Get the project root directory (3 levels up from this file)
+    try:
+        if not RESUME_PATH.exists():
+            raise DataLoadError(f"resume.json not found at {RESUME_PATH}")
 
-    if not os.path.exists(RESUME_PATH):
-        raise FileNotFoundError(f"resume.json not found at {RESUME_PATH}")
+        with open(RESUME_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
 
-    with open(RESUME_PATH, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    return ResumeContent(**data)
+        return ResumeContent(**data)
+    except (json.JSONDecodeError, ValueError) as e:
+        raise DataLoadError(f"Failed to parse resume.json: {e}") from e
+    except Exception as e:
+        raise DataLoadError(f"Failed to read resume.json: {e}") from e
