@@ -1,18 +1,20 @@
 from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
 
-# Job Description Analyst Model
+# Job Model
 
 
 class JobDetails(BaseModel):
-    """Structured model for basic job information."""
-
-    company_name: str = Field(..., description="The name of the hiring company.")
+    """Structured model for job postings."""
+    company_name: str = Field(...,
+                              description="The name of the hiring company.")
     job_title: str = Field(..., description="The title of the position.")
-    location: str = Field(
-        ..., description="The location of the job (e.g., City, State, Remote)."
-    )
-    job_id: Optional[str] = Field(None, description="The job identifier, if available.")
+    location: str = Field(...,
+                          description="The location of the job (e.g., City, State, Remote).")
+    job_id: Optional[str] = Field(
+        None, description="The job identifier, if available.")
+    job_description: str = Field(...,
+                                 description="The full text of the job description.")
 
 
 class Skills(BaseModel):
@@ -35,6 +37,7 @@ class Skills(BaseModel):
         description="List of skills mentioned as a 'plus' or 'nice-to-have'.",
     )
 
+
 class KeyTerms(BaseModel):
     """Structured model for key terms."""
     responsibilities_and_qualifications: List[str] = Field(
@@ -49,10 +52,6 @@ class KeyTerms(BaseModel):
 
 class JobAnalysis(BaseModel):
     """The complete structured output from the Job Description Analyst agent."""
-
-    job_details: JobDetails = Field(
-        ..., description="Core details about the job and company."
-    )
     skills: Skills = Field(
         ..., description="A categorized breakdown of all required skills."
     )
@@ -62,30 +61,11 @@ class JobAnalysis(BaseModel):
     )
 
 
-# Resume Model
-
-
-class Metadata(BaseModel):
-    job_title: str = Field(..., description="Job title")
-    company_name: str = Field(..., description="Company name")
-    job_id: Optional[str] = Field(None, description="Job ID")
-    location: str = Field(..., description="Location")
-
-
-class Link(BaseModel):
-    platform: str = Field(..., description="Platform name")
-    url: str = Field(..., description="Platform URL")
+# Resume Content Model
 
 
 class ProfessionalSummary(BaseModel):
     summary: str = Field(..., description="Professional summary")
-
-
-class ContactInfo(BaseModel):
-    name: str = Field(..., description="Name")
-    phone: str = Field(..., description="Phone number")
-    email: EmailStr = Field(..., description="Email address")
-    links: List[Link] = Field(..., description="Links")
 
 
 class WorkExperience(BaseModel):
@@ -112,13 +92,31 @@ class Project(BaseModel):
     description: str = Field(..., description="Project description")
 
 
-class Resume(BaseModel):
-    metadata: Metadata = Field(..., description="Metadata")
-    contact_info: ContactInfo = Field(..., description="Contact information")
+class ResumeContent(BaseModel):
     professional_summary: ProfessionalSummary = Field(
         ..., description="Professional summary"
     )
-    work_experience: List[WorkExperience] = Field(..., description="Work experience")
+    work_experience: List[WorkExperience] = Field(
+        ..., description="Work experience")
     education: List[Education] = Field(..., description="Education")
     skills: List[Skill] = Field(..., description="Skills")
     projects: List[Project] = Field(..., description="Projects")
+
+
+# Resume Model
+
+class Link(BaseModel):
+    platform: str = Field(..., description="Platform name")
+    url: str = Field(..., description="Platform URL")
+
+
+class ContactInfo(BaseModel):
+    name: str = Field(..., description="Name")
+    phone: str = Field(..., description="Phone number")
+    email: EmailStr = Field(..., description="Email address")
+    links: List[Link] = Field(..., description="Links")
+
+
+class Resume(BaseModel):
+    contact_info: ContactInfo = Field(..., description="Contact information")
+    resume_content: ResumeContent = Field(..., description="Resume content")

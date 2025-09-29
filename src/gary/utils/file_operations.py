@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Optional, List
 import json
 from pydantic import BaseModel
-from src.gary.models import Resume
+from src.gary.models import ResumeContent
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 RESUME_PATH = PROJECT_ROOT / "data" / "resume.json"
@@ -27,7 +27,7 @@ def load_resume():
     try:
         with open(RESUME_PATH, "r", encoding='utf-8') as f:
             resume_data = json.load(f)
-        return Resume(**resume_data)
+        return ResumeContent(**resume_data)
     except FileNotFoundError:
         raise FileNotFoundError(f"Resume file not found at: {RESUME_PATH}")
     except json.JSONDecodeError as e:

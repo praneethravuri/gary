@@ -9,25 +9,16 @@ job_analysis_task:
         - Focus on specific technical skills, programming languages, tools, certifications and leadership/management skills
         - Capture actual responsibilities and duties, not generic corporate speak
         - Extract company mission/values that are substantive, not just marketing fluff
-        - Standardize the job title to its core functional role. Remove all seniority levels, qualifiers, and program-specific tags.
-        - Strip out all terms like "1", "2", "I", "II", "Associate", "Senior" and tags like "Early Careers", "New Grad", etc from the job title.
-        - Standardize the location to the format 'City, ST, USA'.
 
         **Extract the following structured data:**
 
-        **1. Job Details (job_details):**
-        - company_name: The name of the hiring company
-        - job_title: The standardized job title (core functional role only)
-        - location: Location in 'City, ST, USA' format
-        - job_id: Job identifier if available (optional)
-
-        **2. Skills (skills):**
+        **1. Skills (skills):**
         - technical: List of technical, hard, tools, and technologies (Python, SQL, GCP, AWS, Tableau, Power BI, Looker, etc.)
         - soft: List of soft or interpersonal skills (communication, teamwork, etc.)
         - management: List of management or leadership skills (cross-functional collaboration, stakeholder management, etc.)
         - bonus: List of skills mentioned as 'plus' or 'nice-to-have'
 
-        **3. Key Terms (key_terms):**
+        **2. Key Terms (key_terms):**
         - responsibilities_and_qualifications: Verbatim list of responsibilities and qualifications from the job description
         - company_culture_keywords: Keywords related to the company's mission, culture, and values
 
