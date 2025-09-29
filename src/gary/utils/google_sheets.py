@@ -1,12 +1,9 @@
-import gspread
 import os
-from typing import List, Optional, Tuple
+import gspread
+from typing import List, Tuple
 from google.oauth2.service_account import Credentials
-from dotenv import load_dotenv
 from gary.models import JobDetails
 from gary.utils.clean_job_description import clean_job_description
-
-load_dotenv()
 
 
 class GoogleSheetsClient:
@@ -145,12 +142,27 @@ class GoogleSheetsClient:
         return last_row_number, job_details
 
 
-    
-sheets_client = GoogleSheetsClient("googleSheetsCredentials.json")
-sheet_id = os.getenv("GOOGLE_SHEETS_ID")
-if sheet_id:
-    sheets_client.connect_to_sheet(sheet_id)
-    # all_rows = sheets_client.get_all_rows()
-    # print(all_rows)
-else:
-    print("GOOGLE_SHEETS_ID not found in environment variables")
+def initialize_sheets_client(
+    credentials_file: str = "googleSheetsCredentials.json",
+    worksheet_name: str = "Sheet1"
+) -> GoogleSheetsClient:
+    """
+    Initialize and connect Google Sheets client.
+
+    Args:
+        credentials_file: Path to the service account JSON file
+        worksheet_name: Name of the worksheet (default: "Sheet1")
+
+    Returns:
+        Connected GoogleSheetsClient instance
+
+    Raises:
+        ValueError: If GOOGLE_SHEETS_ID not found in environment variables
+    """
+    sheet_id = os.getenv("GOOGLE_SHEETS_ID")
+    if not sheet_id:
+        raise ValueError("GOOGLE_SHEETS_ID not found in environment variables")
+
+    client = GoogleSheetsClient(credentials_file)
+    client.connect_to_sheet(sheet_id, worksheet_name)
+    return client
