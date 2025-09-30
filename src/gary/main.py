@@ -1,15 +1,59 @@
 #!/usr/bin/env python
 import sys
 import warnings
+from datetime import datetime
 from gary.crew import Gary
 from gary.utils.read_json import read_header_json, read_resume_json
-from gary.models import Resume, ResumeContent
+from gary.models import Resume, ResumeContent, JobDetails
 from gary.utils.resume_word_doc_generator import generate_word_resume
 from gary.utils.google_sheets import initialize_sheets_client
 from gary.utils.result_parser import parse_crew_result
-from src.gary.config import RESUME_GENERATED_GOOGLE_SHEETS_COLUMN, JOB_DESCRIPTION_GOOGLE_SHEETS_COLUMN
+from gary.utils.clean_job_description import clean_job_description
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
+
+
+def get_job_details_from_cli() -> JobDetails:
+    """
+    Collect job details from CLI prompts.
+
+    Returns:
+        JobDetails: Populated job details model
+    """
+    print("="*80)
+    print("JOB DETAILS INPUT")
+    print("="*80)
+
+    company_name = input("Company Name: ").strip()
+    job_title = input("Job Title: ").strip()
+    location = input("Location: ").strip()
+    job_id = input("Job ID (optional, press Enter to skip): ").strip()
+
+    print("\nJob Description (paste below, then type 'END' on a new line and press Enter):")
+    description_lines = []
+    while True:
+        line = input()
+        if line.strip() == "END":
+            break
+        description_lines.append(line)
+
+    job_description = "\n".join(description_lines).strip()
+
+    # Automatically set date to today in MM-DD-YYYY format
+    date_applied = datetime.now().strftime("%m-%d-%Y")
+
+    # Create JobDetails with cleaned description
+    job_details = JobDetails(
+        company_name=company_name,
+        job_title=job_title,
+        location=location,
+        job_id=job_id if job_id else None,
+        job_description=clean_job_description(job_description),
+        date_applied=date_applied
+    )
+
+    print(f"\n✓ Job details collected for {company_name} - {job_title} (Applied: {date_applied})")
+    return job_details
 
 
 def run() -> None:
@@ -17,9 +61,8 @@ def run() -> None:
     Run the crew with comprehensive error handling.
     """
     try:
-        # 1. Connect to Google Sheets and extract last row as JobDetails
-        sheets_client = initialize_sheets_client()
-        last_row_number, job_details = sheets_client.get_last_row_as_job_details()
+        # 1. Collect job details from CLI
+        job_details = get_job_details_from_cli()
 
         # 2. Read resume from resume.json as ResumeContent
         master_resume = read_resume_json()
@@ -55,13 +98,19 @@ def run() -> None:
         file_path = generate_word_resume(final_resume, job_details)
         print(f"✓ Resume generated successfully: {file_path}")
 
-        # 6. Update 7th cell of last row to "Done"
-        sheets_client.update_cell(last_row_number, RESUME_GENERATED_GOOGLE_SHEETS_COLUMN, "Done")
-        print(f"✓ Updated row {last_row_number}, column {RESUME_GENERATED_GOOGLE_SHEETS_COLUMN} to 'Done'")
-
-        # 7. Update the 6th cell of last row with cleaned job description
-        sheets_client.update_cell(last_row_number, JOB_DESCRIPTION_GOOGLE_SHEETS_COLUMN, job_details.job_description)
-        print(f"✓ Updated row {last_row_number}, column {JOB_DESCRIPTION_GOOGLE_SHEETS_COLUMN} with cleaned job description")
+        # 6. Append job details to Google Sheets
+        sheets_client = initialize_sheets_client()
+        row_data = [
+            job_details.date_applied,
+            job_details.company_name,
+            job_details.job_title,
+            job_details.location,
+            job_details.job_id or "",
+            job_details.job_description,
+            "Done"
+        ]
+        sheets_client.append_row(row_data)
+        print(f"✓ Job details logged to Google Sheets")
 
         # Display usage metrics if available
         if hasattr(gary_crew, "usage_metrics") and gary_crew.usage_metrics:

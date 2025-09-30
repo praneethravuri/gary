@@ -15,6 +15,8 @@ class JobDetails(BaseModel):
         None, description="The job identifier, if available.")
     job_description: str = Field(...,
                                  description="The full text of the job description.")
+    date_applied: str = Field(...,
+                              description="Date applied in MM-DD-YYYY format.")
 
 
 class Skills(BaseModel):

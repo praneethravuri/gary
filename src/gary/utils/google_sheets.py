@@ -1,10 +1,8 @@
 import os
 import gspread
-from typing import List, Tuple, Optional
+from typing import List
 from google.oauth2.service_account import Credentials
-from gary.models import JobDetails
-from gary.utils.clean_job_description import clean_job_description
-from gary.config import DEFAULT_WORKSHEET_NAME, CREDENTIALS_FILE, RESUME_GENERATED_GOOGLE_SHEETS_COLUMN
+from gary.config import DEFAULT_WORKSHEET_NAME, CREDENTIALS_FILE
 from gary.exceptions import GoogleSheetsError
 
 
@@ -39,46 +37,12 @@ class GoogleSheetsClient:
         self.sheet = self.client.open_by_key(sheet_id)
         self.worksheet = self.sheet.worksheet(worksheet_name)
 
-    def get_all_rows(self) -> List[List[str]]:
+    def append_row(self, row_data: List[str]) -> None:
         """
-        Extract all rows from the connected worksheet.
-
-        Returns:
-            List[List[str]]: List of lists containing all row data
-
-        Raises:
-            GoogleSheetsError: If no worksheet is connected
-        """
-        if not self.worksheet:
-            raise GoogleSheetsError("No worksheet connected. Call connect_to_sheet() first.")
-
-        return self.worksheet.get_all_values()
-
-    def get_all_records(self) -> List[dict]:
-        """
-        Extract all records from the worksheet as dictionaries.
-        Uses first row as headers.
-
-        Returns:
-            List[dict]: List of dictionaries with column headers as keys
-
-        Raises:
-            GoogleSheetsError: If no worksheet is connected
-        """
-        if not self.worksheet:
-            raise GoogleSheetsError("No worksheet connected. Call connect_to_sheet() first.")
-
-        return self.worksheet.get_all_records()
-
-    def get_row(self, row_number: int) -> List[str]:
-        """
-        Get a specific row by number.
+        Append a row to the worksheet.
 
         Args:
-            row_number: Row number (1-indexed)
-
-        Returns:
-            List[str]: List of values in the specified row
+            row_data: List of values to append as a new row
 
         Raises:
             GoogleSheetsError: If no worksheet is connected
@@ -86,67 +50,7 @@ class GoogleSheetsClient:
         if not self.worksheet:
             raise GoogleSheetsError("No worksheet connected. Call connect_to_sheet() first.")
 
-        return self.worksheet.row_values(row_number)
-
-    def update_cell(self, row: int, col: int, value: str) -> None:
-        """
-        Update a specific cell in the worksheet.
-
-        Args:
-            row: Row number (1-indexed)
-            col: Column number (1-indexed)
-            value: Value to set in the cell
-
-        Raises:
-            GoogleSheetsError: If no worksheet is connected
-        """
-        if not self.worksheet:
-            raise GoogleSheetsError("No worksheet connected. Call connect_to_sheet() first.")
-
-        self.worksheet.update_cell(row, col, value)
-
-    def get_last_row_as_job_details(self) -> Tuple[int, JobDetails]:
-        """
-        Get the last row from the worksheet (cells 1-5) and return as JobDetails.
-
-        Returns:
-            Tuple of (row_number, JobDetails model)
-
-        Raises:
-            GoogleSheetsError: If no worksheet is connected, worksheet is empty, or insufficient data
-        """
-        try:
-            if not self.worksheet:
-                raise GoogleSheetsError("No worksheet connected. Call connect_to_sheet() first.")
-
-            all_rows = self.worksheet.get_all_values()
-
-            if not all_rows:
-                raise GoogleSheetsError("Worksheet is empty")
-
-            last_row = all_rows[-1]
-            last_row_number = len(all_rows)
-
-            if len(last_row) < 5:
-                raise GoogleSheetsError(f"Last row has only {len(last_row)} cells, need at least 5")
-
-            # Extract first 5 cells
-            company_name, job_title, location, job_id, job_description = last_row[:5]
-
-            # Create JobDetails instance
-            job_details = JobDetails(
-                company_name=company_name,
-                job_title=job_title,
-                location=location,
-                job_id=job_id if job_id else None,
-                job_description=clean_job_description(job_description),
-            )
-
-            return last_row_number, job_details
-        except Exception as e:
-            if isinstance(e, GoogleSheetsError):
-                raise
-            raise GoogleSheetsError(f"Failed to retrieve job details: {e}") from e
+        self.worksheet.append_row(row_data)
 
 
 def initialize_sheets_client(

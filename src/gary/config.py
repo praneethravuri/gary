@@ -19,6 +19,3 @@ RESUME_WORD_TEMPLATE = TEMPLATES_DIR / "resume_word_template.docx"
 # Google Sheets configuration
 DEFAULT_WORKSHEET_NAME = "Sheet1"
 CREDENTIALS_FILE = "googleSheetsCredentials.json"
-
-RESUME_GENERATED_GOOGLE_SHEETS_COLUMN = 7
-JOB_DESCRIPTION_GOOGLE_SHEETS_COLUMN = 6
