@@ -7,7 +7,6 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 # Data directories
 DATA_DIR = PROJECT_ROOT / "data"
 RESUME_PATH = DATA_DIR / "resume.json"
-HEADER_PATH = DATA_DIR / "header.json"
 
 # Output directories
 RESUMES_DIR = PROJECT_ROOT / "resumes"

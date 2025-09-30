@@ -3,7 +3,7 @@ from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
-from src.gary.models import JobAnalysis, ResumeContent
+from gary.models import JobAnalysis, ResumeContent
 
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")

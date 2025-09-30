@@ -3,8 +3,8 @@ import sys
 import warnings
 from datetime import datetime
 from gary.crew import Gary
-from gary.utils.read_json import read_header_json, read_resume_json
-from gary.models import Resume, ResumeContent, JobDetails
+from gary.utils.read_json import read_resume_json
+from gary.models import Resume, JobDetails
 from gary.utils.resume_word_doc_generator import generate_word_resume
 from gary.utils.google_sheets import initialize_sheets_client
 from gary.utils.result_parser import parse_crew_result
@@ -64,25 +64,35 @@ def run() -> None:
         # 1. Collect job details from CLI
         job_details = get_job_details_from_cli()
 
-        # 2. Read resume from resume.json as ResumeContent
+        # 2. Read master resume from resume.json
         master_resume = read_resume_json()
 
-        # 3. Send resume and job description to crew
+        # 3. Extract resume content (without header) for crew processing
+        resume_content_dict = {
+            "professional_summary": master_resume.professional_summary.model_dump(),
+            "work_experience": [exp.model_dump() for exp in master_resume.work_experience],
+            "education": [edu.model_dump() for edu in master_resume.education],
+            "skills": [skill.model_dump() for skill in master_resume.skills],
+            "projects": [proj.model_dump() for proj in master_resume.projects],
+        }
+
+        # 4. Send resume content and job description to crew
         inputs = {
             "job_description": job_details.job_description,
-            "master_resume": master_resume.model_dump(),
+            "master_resume": resume_content_dict,
         }
 
         gary_crew = Gary().crew()
         result = gary_crew.kickoff(inputs=inputs)
         print(result)
 
-        # 4. Load header and prepare final resume
-        header = read_header_json()
+        # 5. Prepare final resume with updated header location
+        header = master_resume.header.model_copy()
         header.location = job_details.location
 
         # Parse CrewAI result
         result_data = parse_crew_result(result)
+        from gary.models import ResumeContent
         resume_content = ResumeContent(**result_data)
         final_resume = Resume(header=header, resume_content=resume_content)
 

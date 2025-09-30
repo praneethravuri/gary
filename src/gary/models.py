@@ -73,14 +73,16 @@ class ProfessionalSummary(BaseModel):
 class WorkExperience(BaseModel):
     title: str = Field(..., description="Job title")
     company: str = Field(..., description="Company name")
-    dates: str = Field(..., description="Dates")
+    startDate: str = Field(..., description="Start date")
+    endDate: str = Field(..., description="End date")
     responsibilities: List[str] = Field(..., description="Responsibilities")
 
 
 class Education(BaseModel):
     degree: str = Field(..., description="Degree")
     institution: str = Field(..., description="Institution")
-    dates: str = Field(..., description="Dates")
+    startDate: str = Field(..., description="Start date")
+    endDate: str = Field(..., description="End date")
     coursework: List[str] = Field(..., description="Coursework")
 
 
@@ -123,3 +125,13 @@ class Header(BaseModel):
 class Resume(BaseModel):
     header: Header = Field(..., description="Contact information")
     resume_content: ResumeContent = Field(..., description="Resume content")
+
+
+class MasterResume(BaseModel):
+    """Combined resume model containing both header and content."""
+    header: Header = Field(..., description="Contact information")
+    professional_summary: ProfessionalSummary = Field(..., description="Professional summary")
+    work_experience: List[WorkExperience] = Field(..., description="Work experience")
+    education: List[Education] = Field(..., description="Education")
+    skills: List[Skill] = Field(..., description="Skills")
+    projects: List[Project] = Field(..., description="Projects")
