@@ -42,11 +42,11 @@ class KeyTerms(BaseModel):
     """Structured model for key terms."""
     responsibilities_and_qualifications: List[str] = Field(
         ...,
-        description="A verbatim list of responsibilities and qualifications from the job description like Responsibilities, Qualifications, Duties, etc.",
+        description="Summarized, jargon-free core responsibilities and qualifications. Focus on actionable duties and measurable requirements, filtering out corporate buzzwords and fluff.",
     )
     company_culture_keywords: List[str] = Field(
         ...,
-        description="Keywords related to the company's mission, culture, and values like Mission, Vision, Values, etc.",
+        description="Substantive keywords related to the company's mission, culture, and values. Exclude generic marketing phrases.",
     )
 
 

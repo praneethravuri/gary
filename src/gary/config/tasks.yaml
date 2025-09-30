@@ -1,26 +1,14 @@
 job_analysis_task:
     description: >
         Analyze the provided job description and extract structured information according to the JobAnalysis model.
-        Focus on ATS-compatible keywords while filtering out corporate jargon.
+        Focus on ATS-compatible keywords while systematically filtering out corporate jargon and buzzwords.
 
         **Key Instructions:**
-        - Extract concrete skills, tools, technologies, qualifications, responsibilities, duties, and company culture keywords
-        - Ignore corporate jargon and buzzwords like "rockstar," "ninja," "synergy," "disruptive," "game-changer"
-        - Focus on specific technical skills, programming languages, tools, certifications and leadership/management skills
-        - Capture actual responsibilities and duties, not generic corporate speak
-        - Extract company mission/values that are substantive, not just marketing fluff
-
-        **Extract the following structured data:**
-
-        **1. Skills (skills):**
-        - technical: List of technical, hard, tools, and technologies (Python, SQL, GCP, AWS, Tableau, Power BI, Looker, etc.)
-        - soft: List of soft or interpersonal skills (communication, teamwork, etc.)
-        - management: List of management or leadership skills (cross-functional collaboration, stakeholder management, etc.)
-        - bonus: List of skills mentioned as 'plus' or 'nice-to-have'
-
-        **2. Key Terms (key_terms):**
-        - responsibilities_and_qualifications: Verbatim list of responsibilities and qualifications from the job description
-        - company_culture_keywords: Keywords related to the company's mission, culture, and values
+        - Extract concrete skills, tools, technologies, qualifications, responsibilities, and duties
+        - Aggressively filter out corporate jargon like "rockstar," "ninja," "synergy," "disruptive," "game-changer," "dynamic," "fast-paced," "world-class", "problem solving"
+        - Focus on specific technical skills, programming languages, tools, certifications, and measurable leadership/management skills
+        - Distill responsibilities and qualifications into their core, actionable essence—remove fluff and rewrite in clear, direct language
+        - Extract only substantive company mission/values keywords, not generic marketing phrases
 
         Job Description:
         ```
@@ -28,11 +16,7 @@ job_analysis_task:
         ```
 
     expected_output: >
-        A clean JSON object following the `JobAnalysis` Pydantic model structure with three main sections:
-        - job_details: Core job and company information
-        - skills: Categorized breakdown of all required skills (technical, soft, management, bonus)
-        - key_terms: Categorized breakdown of responsibilities/qualifications and company culture keywords
-
+        A clean JSON object following the `JobAnalysis` Pydantic model structure.
         Focus on extracting concrete, ATS-friendly keywords while filtering out meaningless corporate jargon.
         Do not include any preamble or extra text outside of the JSON object.
 
