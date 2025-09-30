@@ -59,9 +59,9 @@ class Gary:
         )
 
     @agent
-    def resume_tailorer(self) -> Agent:
+    def resume_tailor(self) -> Agent:
         return Agent(
-            config=self.agents_config["resume_tailorer"],
+            config=self.agents_config["resume_tailor"],
             verbose=True,
             llm=llm_config(
                 "openrouter/deepseek/deepseek-chat-v3-0324", 0.4
@@ -70,17 +70,6 @@ class Gary:
             allow_delegation=False,
         )
 
-    @agent
-    def resume_refiner(self) -> Agent:
-        return Agent(
-            config=self.agents_config["resume_refiner"],
-            verbose=True,
-            llm=llm_config(
-                "openrouter/deepseek/deepseek-chat-v3-0324", 0.5
-            ),
-            max_iter=3,
-            allow_delegation=False,
-        )
 
     @task
     def job_analysis_task(self) -> Task:
@@ -94,23 +83,13 @@ class Gary:
     def resume_tailoring_task(self) -> Task:
         return Task(
             config=self.tasks_config["resume_tailoring_task"],
-            agent=self.resume_tailorer(),
+            agent=self.resume_tailor(),
             context=[
                 self.job_analysis_task()
             ],  # Use output from job analysis as context
             output_pydantic=ResumeContent,
         )
 
-    @task
-    def resume_refinement_task(self) -> Task:
-        return Task(
-            config=self.tasks_config["resume_refinement_task"],
-            agent=self.resume_refiner(),
-            context=[
-                self.resume_tailoring_task()
-            ],
-            output_pydantic=ResumeContent,
-        )
 
     @crew
     def crew(self) -> Crew:
