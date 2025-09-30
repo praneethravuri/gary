@@ -4,7 +4,7 @@ from typing import List, Tuple, Optional
 from google.oauth2.service_account import Credentials
 from gary.models import JobDetails
 from gary.utils.clean_job_description import clean_job_description
-from gary.config import DEFAULT_WORKSHEET_NAME, CREDENTIALS_FILE
+from gary.config import DEFAULT_WORKSHEET_NAME, CREDENTIALS_FILE, RESUME_GENERATED_GOOGLE_SHEETS_COLUMN
 from gary.exceptions import GoogleSheetsError
 
 

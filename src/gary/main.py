@@ -7,6 +7,7 @@ from gary.models import Resume, ResumeContent
 from gary.utils.resume_word_doc_generator import generate_word_resume
 from gary.utils.google_sheets import initialize_sheets_client
 from gary.utils.result_parser import parse_crew_result
+from src.gary.config import RESUME_GENERATED_GOOGLE_SHEETS_COLUMN, JOB_DESCRIPTION_GOOGLE_SHEETS_COLUMN
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
@@ -54,9 +55,13 @@ def run() -> None:
         file_path = generate_word_resume(final_resume, job_details)
         print(f"✓ Resume generated successfully: {file_path}")
 
-        # 6. Update 6th cell of last row to "Done"
-        sheets_client.update_cell(last_row_number, 6, "Done")
-        print(f"✓ Updated row {last_row_number}, column 6 to 'Done'")
+        # 6. Update 7th cell of last row to "Done"
+        sheets_client.update_cell(last_row_number, RESUME_GENERATED_GOOGLE_SHEETS_COLUMN, "Done")
+        print(f"✓ Updated row {last_row_number}, column {RESUME_GENERATED_GOOGLE_SHEETS_COLUMN} to 'Done'")
+
+        # 7. Update the 6th cell of last row with cleaned job description
+        sheets_client.update_cell(last_row_number, JOB_DESCRIPTION_GOOGLE_SHEETS_COLUMN, job_details.job_description)
+        print(f"✓ Updated row {last_row_number}, column {JOB_DESCRIPTION_GOOGLE_SHEETS_COLUMN} with cleaned job description")
 
         # Display usage metrics if available
         if hasattr(gary_crew, "usage_metrics") and gary_crew.usage_metrics:
