@@ -3,7 +3,8 @@ from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
-from gary.models import JobAnalysis, ResumeContent
+from gary.models import JobAnalysis, ResumeContent, ResumeValidationReport
+from gary.tools import ResumeWordDocGeneratorTool
 
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
@@ -70,6 +71,19 @@ class Gary:
             allow_delegation=False,
         )
 
+    @agent
+    def resume_validator(self) -> Agent:
+        return Agent(
+            config=self.agents_config["resume_validator"],
+            verbose=True,
+            llm=llm_config(
+                "openrouter/deepseek/deepseek-chat-v3-0324", 0.2
+            ),
+            max_iter=3,
+            allow_delegation=False,
+            tools=[ResumeWordDocGeneratorTool()],
+        )
+
 
     @task
     def job_analysis_task(self) -> Task:
@@ -88,6 +102,18 @@ class Gary:
                 self.job_analysis_task()
             ],  # Use output from job analysis as context
             output_pydantic=ResumeContent,
+        )
+
+    @task
+    def resume_validation_task(self) -> Task:
+        return Task(
+            config=self.tasks_config["resume_validation_task"],
+            agent=self.resume_validator(),
+            context=[
+                self.job_analysis_task(),
+                self.resume_tailoring_task()
+            ],  # Use outputs from job analysis and resume tailoring
+            output_pydantic=ResumeValidationReport,
         )
 
 

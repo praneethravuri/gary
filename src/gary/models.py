@@ -135,3 +135,41 @@ class MasterResume(BaseModel):
     education: List[Education] = Field(..., description="Education")
     skills: List[Skill] = Field(..., description="Skills")
     projects: List[Project] = Field(..., description="Projects")
+
+
+# Resume Validation Models
+
+class KeywordIntegration(BaseModel):
+    """Analysis of keyword integration in the resume."""
+    total_keywords_from_job: int = Field(..., description="Total number of keywords identified in the job description")
+    keywords_integrated: int = Field(..., description="Number of keywords successfully integrated into the resume")
+    integration_rate: float = Field(..., description="Percentage of keywords integrated (0-100)")
+    missing_critical_keywords: List[str] = Field(default=[], description="List of critical keywords that should be added")
+    naturally_integrated_keywords: List[str] = Field(default=[], description="Keywords that were integrated naturally")
+    forced_keywords: List[str] = Field(default=[], description="Keywords that appear forced or unnaturally placed")
+
+
+class PhraseUsage(BaseModel):
+    """Analysis of specific phrase usage from job description."""
+    phrases_used_correctly: List[str] = Field(default=[], description="Phrases from job description used appropriately")
+    phrases_used_incorrectly: List[str] = Field(default=[], description="Phrases that are misused or don't fit context")
+    missing_important_phrases: List[str] = Field(default=[], description="Important phrases from job description not used")
+
+
+class ValidationFeedback(BaseModel):
+    """Detailed feedback on resume quality."""
+    strengths: List[str] = Field(..., description="What the resume does well")
+    weaknesses: List[str] = Field(..., description="Areas that need improvement")
+    suggestions: List[str] = Field(..., description="Specific actionable suggestions for improvement")
+    ats_score: int = Field(..., description="ATS compatibility score (0-100)")
+    human_readability_score: int = Field(..., description="How natural and human-written the resume sounds (0-100)")
+
+
+class ResumeValidationReport(BaseModel):
+    """Complete validation report for a tailored resume."""
+    passed_validation: bool = Field(..., description="Whether the resume passes validation criteria")
+    overall_score: int = Field(..., description="Overall resume quality score (0-100)")
+    keyword_analysis: KeywordIntegration = Field(..., description="Analysis of keyword integration")
+    phrase_analysis: PhraseUsage = Field(..., description="Analysis of phrase usage")
+    feedback: ValidationFeedback = Field(..., description="Detailed feedback and suggestions")
+    ready_for_generation: bool = Field(..., description="Whether resume is ready for Word document generation")

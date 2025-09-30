@@ -84,24 +84,64 @@ def run() -> None:
 
         gary_crew = Gary().crew()
         result = gary_crew.kickoff(inputs=inputs)
-        print(result)
 
-        # 5. Prepare final resume with updated header location
+        # 5. Extract outputs from crew tasks
+        # The crew returns the last task's output (validation report)
+        # We need to get the resume content from the resume_tailoring_task
+        from gary.models import ResumeContent, ResumeValidationReport
+
+        # Get the resume content from tasks_output
+        resume_content_output = None
+        validation_report_output = None
+
+        for task_output in result.tasks_output:
+            if task_output.pydantic and isinstance(task_output.pydantic, ResumeContent):
+                resume_content_output = task_output.pydantic
+            elif task_output.pydantic and isinstance(task_output.pydantic, ResumeValidationReport):
+                validation_report_output = task_output.pydantic
+
+        if not resume_content_output:
+            raise ValueError("Resume content not found in crew output")
+
+        # 6. Prepare final resume with updated header location
         header = master_resume.header.model_copy()
         header.location = job_details.location
+        final_resume = Resume(header=header, resume_content=resume_content_output)
 
-        # Parse CrewAI result
-        result_data = parse_crew_result(result)
-        from gary.models import ResumeContent
-        resume_content = ResumeContent(**result_data)
-        final_resume = Resume(header=header, resume_content=resume_content)
+        # 7. Display validation report
+        if validation_report_output:
+            print("\n" + "="*80)
+            print("RESUME VALIDATION REPORT")
+            print("="*80)
+            print(f"Passed Validation: {validation_report_output.passed_validation}")
+            print(f"Overall Score: {validation_report_output.overall_score}/100")
+            print(f"Ready for Generation: {validation_report_output.ready_for_generation}")
+            print(f"\nKeyword Integration Rate: {validation_report_output.keyword_analysis.integration_rate:.1f}%")
+            print(f"Keywords Integrated: {validation_report_output.keyword_analysis.keywords_integrated}/{validation_report_output.keyword_analysis.total_keywords_from_job}")
+            print(f"ATS Score: {validation_report_output.feedback.ats_score}/100")
+            print(f"Human Readability Score: {validation_report_output.feedback.human_readability_score}/100")
+
+            if validation_report_output.feedback.strengths:
+                print(f"\nStrengths:")
+                for strength in validation_report_output.feedback.strengths:
+                    print(f"  ✓ {strength}")
+
+            if validation_report_output.feedback.weaknesses:
+                print(f"\nWeaknesses:")
+                for weakness in validation_report_output.feedback.weaknesses:
+                    print(f"  ✗ {weakness}")
+
+            if validation_report_output.feedback.suggestions:
+                print(f"\nSuggestions:")
+                for suggestion in validation_report_output.feedback.suggestions:
+                    print(f"  → {suggestion}")
 
         print("\n" + "="*80)
         print("FINAL RESUME")
         print("="*80)
         print(final_resume.model_dump_json(indent=2))
 
-        # 5. Generate Word document
+        # 8. Generate Word document
         print("\n" + "="*80)
         print("GENERATING WORD DOCUMENT")
         print("="*80)

@@ -92,3 +92,57 @@ resume_tailoring_task:
         A single, clean JSON object that strictly adheres to the `Resume` Pydantic model.
         Do not include any introductory text, explanations, or any content outside of the final JSON object.
 
+resume_validation_task:
+    description: >
+        Validate the tailored resume against the job analysis to ensure quality, keyword integration,
+        and readiness for document generation. Use the context from previous tasks (job analysis and
+        tailored resume) to perform comprehensive analysis and provide actionable feedback.
+
+        **Validation Criteria:**
+
+        **1. Keyword Integration Analysis:**
+        - Count total keywords from job analysis (technical skills, soft skills, management skills, and key terms)
+        - Identify which keywords appear in the resume
+        - Calculate integration rate (percentage of keywords included)
+        - Classify keywords as naturally integrated vs. forced/awkwardly placed
+        - Identify missing critical keywords that should be added
+        - Check for keyword stuffing (same keyword repeated excessively)
+
+        **2. Phrase Usage Analysis:**
+        - Verify that responsibilities and qualifications from job analysis are reflected in resume
+        - Check if industry-specific terminology is used correctly and in proper context
+        - Identify phrases that sound unnatural or AI-generated ("leveraged," "spearheaded," "synergy")
+        - Note important phrases from job description that should be incorporated
+
+        **3. ATS Compatibility Check:**
+        - Evaluate keyword density and distribution across resume sections
+        - Verify technical skills are explicitly stated (not just implied)
+        - Check if quantifiable achievements are present
+        - Assess overall structure and formatting compatibility
+        - Score from 0-100 based on ATS optimization
+
+        **4. Human Readability Assessment:**
+        - Evaluate natural language flow and sentence variety
+        - Identify robotic patterns or AI-generated phrases
+        - Check for authentic voice and third-person consistency
+        - Assess if experience sounds genuine vs. fabricated
+        - Score from 0-100 based on human readability
+
+        **5. Quality Feedback:**
+        - List 3-5 specific strengths of the resume
+        - List 3-5 weaknesses or areas for improvement
+        - Provide 3-5 actionable suggestions for enhancement
+        - Calculate overall score (weighted: 40% keyword integration, 30% ATS score, 30% readability)
+
+        **6. Pass/Fail Determination:**
+        - Resume passes if: overall score >= 75, ATS score >= 70, readability score >= 70, integration rate >= 60%
+        - Resume is ready for generation if: passed_validation = True AND no critical keywords missing
+
+        **Note:** Do NOT use the document generation tool. The validation report will be used by the main
+        workflow to generate the document. Focus only on validation and providing the comprehensive report.
+
+    expected_output: >
+        A comprehensive ResumeValidationReport JSON object that includes all analysis, scores, feedback,
+        and pass/fail determination based on the job analysis and tailored resume from previous tasks.
+        Do not include any preamble or extra text outside of the JSON object.
+
