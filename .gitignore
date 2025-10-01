@@ -219,3 +219,5 @@ __marimo__/
 *.json
 *.xml
 /resumes/
+
+!resume_tailoring_guidelines.txt

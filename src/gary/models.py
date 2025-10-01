@@ -129,10 +129,15 @@ class Resume(BaseModel):
 
 
 class MasterResume(BaseModel):
-    """Combined resume model containing both header and content."""
+    """Combined resume model containing both header and content.
+
+    Note: professional_summary is optional in the master resume. When tailoring,
+    the professional summary will be generated based on the job analysis and
+    master resume content.
+    """
     header: Header = Field(..., description="Contact information")
-    professional_summary: ProfessionalSummary = Field(
-        ..., description="Professional summary")
+    professional_summary: Optional[ProfessionalSummary] = Field(
+        None, description="Professional summary (optional - will be generated during tailoring)")
     work_experience: List[WorkExperience] = Field(
         ..., description="Work experience")
     education: List[Education] = Field(..., description="Education")
