@@ -1,24 +1,33 @@
 job_analysis_task:
     description: >
-        Analyze the provided job description and extract structured information according to the JobAnalysis model.
-        Focus on ATS-compatible keywords while systematically filtering out corporate jargon and buzzwords.
-
-        **Key Instructions:**
-        - Extract concrete skills, tools, technologies, qualifications, responsibilities, and duties
-        - Aggressively filter out corporate jargon like "rockstar," "ninja," "synergy," "disruptive," "game-changer," "dynamic," "fast-paced," "world-class", "problem solving"
-        - Focus on specific technical skills, programming languages, tools, certifications, and measurable leadership/management skills
-        - Distill responsibilities and qualifications into their core, actionable essence—remove fluff and rewrite in clear, direct language
-        - Extract only substantive company mission/values keywords, not generic marketing phrases
+        Analyze the job description and extract all skills, requirements, and company signals for ATS optimization.
 
         Job Description:
         ```
         {job_description}
         ```
 
+        **Extract and categorize:**
+
+        Skills - Separate into technical (programming languages, tools, platforms, certifications), soft (communication, problem-solving),
+        management (leadership, stakeholder management, strategic planning), and bonus/nice-to-have qualifications.
+        Use exact terminology including abbreviations and version numbers.
+
+        Responsibilities & Qualifications - Extract complete phrases covering duties, requirements, and qualifications.
+        Strip buzzwords like "rockstar," "synergy," "disruptive" but preserve core meaning and industry-specific terminology.
+        Include quantifiable requirements (years of experience, education). Flag repeated or emphasized phrases as high priority.
+
+        Company Signals - Identify tone/priorities (fast-paced, collaborative, data-driven, innovative) and cultural values
+        (diversity, growth mindset, work-life balance, mission alignment). Exclude generic marketing language.
+
+        **Quality standards:**
+        - Comprehensive: capture every substantive skill and requirement
+        - Precise: use exact terminology from job description
+        - Deduplicated: each item appears once across all categories
+        - Actionable: focus on concrete, verifiable qualifications over vague attributes
+
     expected_output: >
-        A clean JSON object following the `JobAnalysis` Pydantic model structure.
-        Focus on extracting concrete, ATS-friendly keywords while filtering out meaningless corporate jargon.
-        Do not include any preamble or extra text outside of the JSON object.
+        Complete JobAnalysis object with categorized extraction. No preamble or explanatory text.
 
 resume_tailoring_task:
     description: >
@@ -145,4 +154,3 @@ resume_validation_task:
         A comprehensive ResumeValidationReport JSON object that includes all analysis, scores, feedback,
         and pass/fail determination based on the job analysis and tailored resume from previous tasks.
         Do not include any preamble or extra text outside of the JSON object.
-

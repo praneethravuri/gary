@@ -53,9 +53,9 @@ class Gary:
             config=self.agents_config["job_analyst"],
             verbose=True,
             llm=llm_config(
-                "openrouter/deepseek/deepseek-chat-v3-0324", 0.1
+                "openrouter/google/gemini-2.5-flash", 0.2
             ),
-            max_iter=3,
+            max_iter=7,
             allow_delegation=False,
         )
 
@@ -65,7 +65,7 @@ class Gary:
             config=self.agents_config["resume_tailor"],
             verbose=True,
             llm=llm_config(
-                "openrouter/deepseek/deepseek-chat-v3-0324", 0.4
+                "openrouter/anthropic/claude-sonnet-4", 0.4
             ),
             max_iter=5,
             allow_delegation=False,
@@ -77,7 +77,7 @@ class Gary:
             config=self.agents_config["resume_validator"],
             verbose=True,
             llm=llm_config(
-                "openrouter/deepseek/deepseek-chat-v3-0324", 0.2
+                "openrouter/google/gemini-2.5-flash", 0.2
             ),
             max_iter=3,
             allow_delegation=False,
