@@ -11,7 +11,6 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL")
 
 
-
 def llm_config(model: str, temperature: float) -> LLM:
     """
     Create LLM configuration with error handling.
@@ -52,9 +51,7 @@ class Gary:
         return Agent(
             config=self.agents_config["job_analyst"],
             verbose=True,
-            llm=llm_config(
-                "openrouter/google/gemini-2.5-flash", 0.2
-            ),
+            llm=llm_config("openrouter/google/gemini-2.5-flash", 0.2),
             max_iter=7,
             allow_delegation=False,
         )
@@ -64,9 +61,7 @@ class Gary:
         return Agent(
             config=self.agents_config["resume_tailor"],
             verbose=True,
-            llm=llm_config(
-                "openrouter/anthropic/claude-sonnet-4", 0.4
-            ),
+            llm=llm_config("openrouter/anthropic/claude-sonnet-4", 0.4),
             max_iter=5,
             allow_delegation=False,
         )
@@ -76,14 +71,11 @@ class Gary:
         return Agent(
             config=self.agents_config["resume_validator"],
             verbose=True,
-            llm=llm_config(
-                "openrouter/google/gemini-2.5-flash", 0.2
-            ),
+            llm=llm_config("openrouter/google/gemini-2.5-flash", 0.2),
             max_iter=3,
             allow_delegation=False,
             tools=[ResumeWordDocGeneratorTool()],
         )
-
 
     @task
     def job_analysis_task(self) -> Task:
@@ -111,11 +103,10 @@ class Gary:
             agent=self.resume_validator(),
             context=[
                 self.job_analysis_task(),
-                self.resume_tailoring_task()
+                self.resume_tailoring_task(),
             ],  # Use outputs from job analysis and resume tailoring
             output_pydantic=ResumeValidationReport,
         )
-
 
     @crew
     def crew(self) -> Crew:

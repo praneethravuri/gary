@@ -7,8 +7,14 @@ from gary.utils.resume_word_doc_generator import generate_word_resume
 
 class ResumeWordDocGeneratorInput(BaseModel):
     """Input schema for ResumeWordDocGeneratorTool."""
-    resume: Resume = Field(..., description="Complete resume object containing header and content")
-    job_details: JobDetails = Field(..., description="Job details object containing company, title, and other job information")
+
+    resume: Resume = Field(
+        ..., description="Complete resume object containing header and content"
+    )
+    job_details: JobDetails = Field(
+        ...,
+        description="Job details object containing company, title, and other job information",
+    )
 
 
 class ResumeWordDocGeneratorTool(BaseTool):

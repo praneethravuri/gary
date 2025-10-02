@@ -20,16 +20,18 @@ def get_job_details_from_cli() -> JobDetails:
     Returns:
         JobDetails: Populated job details model
     """
-    print("="*80)
+    print("=" * 80)
     print("JOB DETAILS INPUT")
-    print("="*80)
+    print("=" * 80)
 
     company_name = input("Company Name: ").strip()
     job_title = input("Job Title: ").strip()
     location = input("Location: ").strip()
     job_id = input("Job ID (optional, press Enter to skip): ").strip()
 
-    print("\nJob Description (paste below, then type 'END' on a new line and press Enter):")
+    print(
+        "\nJob Description (paste below, then type 'END' on a new line and press Enter):"
+    )
     description_lines = []
     while True:
         line = input()
@@ -49,10 +51,12 @@ def get_job_details_from_cli() -> JobDetails:
         location=location,
         job_id=job_id if job_id else None,
         job_description=clean_job_description(job_description),
-        date_applied=date_applied
+        date_applied=date_applied,
     )
 
-    print(f"\n✓ Job details collected for {company_name} - {job_title} (Applied: {date_applied})")
+    print(
+        f"\n✓ Job details collected for {company_name} - {job_title} (Applied: {date_applied})"
+    )
     return job_details
 
 
@@ -70,7 +74,9 @@ def run() -> None:
         # 3. Extract resume content (without header) for crew processing
         resume_content_dict = {
             "professional_summary": master_resume.professional_summary.model_dump(),
-            "work_experience": [exp.model_dump() for exp in master_resume.work_experience],
+            "work_experience": [
+                exp.model_dump() for exp in master_resume.work_experience
+            ],
             "education": [edu.model_dump() for edu in master_resume.education],
             "skills": [skill.model_dump() for skill in master_resume.skills],
             "projects": [proj.model_dump() for proj in master_resume.projects],
@@ -97,7 +103,9 @@ def run() -> None:
         for task_output in result.tasks_output:
             if task_output.pydantic and isinstance(task_output.pydantic, ResumeContent):
                 resume_content_output = task_output.pydantic
-            elif task_output.pydantic and isinstance(task_output.pydantic, ResumeValidationReport):
+            elif task_output.pydantic and isinstance(
+                task_output.pydantic, ResumeValidationReport
+            ):
                 validation_report_output = task_output.pydantic
 
         if not resume_content_output:
@@ -110,16 +118,24 @@ def run() -> None:
 
         # 7. Display validation report
         if validation_report_output:
-            print("\n" + "="*80)
+            print("\n" + "=" * 80)
             print("RESUME VALIDATION REPORT")
-            print("="*80)
+            print("=" * 80)
             print(f"Passed Validation: {validation_report_output.passed_validation}")
             print(f"Overall Score: {validation_report_output.overall_score}/100")
-            print(f"Ready for Generation: {validation_report_output.ready_for_generation}")
-            print(f"\nKeyword Integration Rate: {validation_report_output.keyword_analysis.integration_rate:.1f}%")
-            print(f"Keywords Integrated: {validation_report_output.keyword_analysis.keywords_integrated}/{validation_report_output.keyword_analysis.total_keywords_from_job}")
+            print(
+                f"Ready for Generation: {validation_report_output.ready_for_generation}"
+            )
+            print(
+                f"\nKeyword Integration Rate: {validation_report_output.keyword_analysis.integration_rate:.1f}%"
+            )
+            print(
+                f"Keywords Integrated: {validation_report_output.keyword_analysis.keywords_integrated}/{validation_report_output.keyword_analysis.total_keywords_from_job}"
+            )
             print(f"ATS Score: {validation_report_output.feedback.ats_score}/100")
-            print(f"Human Readability Score: {validation_report_output.feedback.human_readability_score}/100")
+            print(
+                f"Human Readability Score: {validation_report_output.feedback.human_readability_score}/100"
+            )
 
             if validation_report_output.feedback.strengths:
                 print(f"\nStrengths:")
@@ -136,15 +152,15 @@ def run() -> None:
                 for suggestion in validation_report_output.feedback.suggestions:
                     print(f"  → {suggestion}")
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("FINAL RESUME")
-        print("="*80)
+        print("=" * 80)
         print(final_resume.model_dump_json(indent=2))
 
         # 8. Generate Word document
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("GENERATING WORD DOCUMENT")
-        print("="*80)
+        print("=" * 80)
         file_path = generate_word_resume(final_resume, job_details)
         print(f"✓ Resume generated successfully: {file_path}")
 
@@ -157,7 +173,7 @@ def run() -> None:
             job_details.location,
             job_details.job_id or "",
             job_details.job_description,
-            "Done"
+            "Done",
         ]
         sheets_client.append_row(row_data)
         print(f"✓ Job details logged to Google Sheets")

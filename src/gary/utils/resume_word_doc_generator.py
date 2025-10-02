@@ -5,6 +5,7 @@ from gary.exceptions import ResumeGenerationError
 import json
 from pathlib import Path
 
+
 def generate_word_resume(resume: Resume, job_details: JobDetails) -> str:
     """
     Generate a Word document resume from Resume and JobDetails objects.
@@ -36,7 +37,9 @@ def generate_word_resume(resume: Resume, job_details: JobDetails) -> str:
         file_path = RESUMES_DIR / file_name
 
         if not RESUME_WORD_TEMPLATE.exists():
-            raise ResumeGenerationError(f"Template file not found: {RESUME_WORD_TEMPLATE}")
+            raise ResumeGenerationError(
+                f"Template file not found: {RESUME_WORD_TEMPLATE}"
+            )
 
         doc = DocxTemplate(RESUME_WORD_TEMPLATE)
         doc.render(resume.model_dump(mode="json"))
@@ -55,7 +58,9 @@ def generate_word_resume(resume: Resume, job_details: JobDetails) -> str:
 
 if __name__ == "__main__":
     # Load master resume from JSON
-    resume_json_path = Path(__file__).parent.parent.parent.parent / "data" / "resume.json"
+    resume_json_path = (
+        Path(__file__).parent.parent.parent.parent / "data" / "resume.json"
+    )
     with open(resume_json_path, "r") as f:
         resume_data = json.load(f)
 
@@ -67,13 +72,10 @@ if __name__ == "__main__":
         work_experience=master_resume.work_experience,
         education=master_resume.education,
         skills=master_resume.skills,
-        projects=master_resume.projects
+        projects=master_resume.projects,
     )
 
-    resume = Resume(
-        header=master_resume.header,
-        resume_content=resume_content
-    )
+    resume = Resume(header=master_resume.header, resume_content=resume_content)
 
     # Create fake job details for testing
     job_details = JobDetails(
@@ -82,7 +84,7 @@ if __name__ == "__main__":
         location="Remote",
         job_id="TEST123",
         job_description="This is a test job description for testing the Word document generation.",
-        date_applied="10-01-2025"
+        date_applied="10-01-2025",
     )
 
     # Generate the Word document

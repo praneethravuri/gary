@@ -1,4 +1,5 @@
 """Centralized configuration for file paths and constants."""
+
 from pathlib import Path
 
 # Project root directory (3 levels up from this file: gary/src/gary/config.py)

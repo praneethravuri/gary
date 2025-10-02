@@ -48,14 +48,16 @@ class GoogleSheetsClient:
             GoogleSheetsError: If no worksheet is connected
         """
         if not self.worksheet:
-            raise GoogleSheetsError("No worksheet connected. Call connect_to_sheet() first.")
+            raise GoogleSheetsError(
+                "No worksheet connected. Call connect_to_sheet() first."
+            )
 
         self.worksheet.append_row(row_data)
 
 
 def initialize_sheets_client(
     credentials_file: str = CREDENTIALS_FILE,
-    worksheet_name: str = DEFAULT_WORKSHEET_NAME
+    worksheet_name: str = DEFAULT_WORKSHEET_NAME,
 ) -> GoogleSheetsClient:
     """
     Initialize and connect Google Sheets client.
@@ -73,7 +75,9 @@ def initialize_sheets_client(
     try:
         sheet_id = os.getenv("GOOGLE_SHEETS_ID")
         if not sheet_id:
-            raise GoogleSheetsError("GOOGLE_SHEETS_ID not found in environment variables")
+            raise GoogleSheetsError(
+                "GOOGLE_SHEETS_ID not found in environment variables"
+            )
 
         client = GoogleSheetsClient(credentials_file)
         client.connect_to_sheet(sheet_id, worksheet_name)
@@ -81,4 +85,6 @@ def initialize_sheets_client(
     except Exception as e:
         if isinstance(e, GoogleSheetsError):
             raise
-        raise GoogleSheetsError(f"Failed to initialize Google Sheets client: {e}") from e
+        raise GoogleSheetsError(
+            f"Failed to initialize Google Sheets client: {e}"
+        ) from e

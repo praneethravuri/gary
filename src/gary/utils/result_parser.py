@@ -1,4 +1,5 @@
 """Utility for parsing CrewAI result outputs."""
+
 import json
 import re
 from typing import Any, Dict
@@ -24,7 +25,7 @@ def parse_crew_result(result: Any) -> Dict[str, Any]:
         ValueError: If result cannot be parsed
     """
     # Handle CrewOutput objects with 'raw' attribute
-    if hasattr(result, 'raw'):
+    if hasattr(result, "raw"):
         result = result.raw
 
     # Handle string results
@@ -40,7 +41,7 @@ def parse_crew_result(result: Any) -> Dict[str, Any]:
 
         # Try to find JSON object/array in the string
         # Look for outermost {...} or [...]
-        json_match = re.search(r'(\{.*\}|\[.*\])', result, re.DOTALL)
+        json_match = re.search(r"(\{.*\}|\[.*\])", result, re.DOTALL)
         if json_match:
             try:
                 return json.loads(json_match.group(1))
