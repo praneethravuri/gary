@@ -1,7 +1,9 @@
 from docxtpl import DocxTemplate
-from gary.models import Resume, JobDetails
+from gary.models import Resume, JobDetails, MasterResume, ResumeContent
 from gary.config import RESUMES_DIR, RESUME_WORD_TEMPLATE
 from gary.exceptions import ResumeGenerationError
+import json
+from pathlib import Path
 
 def generate_word_resume(resume: Resume, job_details: JobDetails) -> str:
     """
@@ -49,3 +51,40 @@ def generate_word_resume(resume: Resume, job_details: JobDetails) -> str:
         raise ResumeGenerationError(f"Cannot write to output directory: {e}") from e
     except Exception as e:
         raise ResumeGenerationError(f"Failed to generate resume: {e}") from e
+
+
+if __name__ == "__main__":
+    # Load master resume from JSON
+    resume_json_path = Path(__file__).parent.parent.parent.parent / "data" / "resume.json"
+    with open(resume_json_path, "r") as f:
+        resume_data = json.load(f)
+
+    master_resume = MasterResume(**resume_data)
+
+    # Convert MasterResume to Resume format
+    resume_content = ResumeContent(
+        professional_summary=master_resume.professional_summary,
+        work_experience=master_resume.work_experience,
+        education=master_resume.education,
+        skills=master_resume.skills,
+        projects=master_resume.projects
+    )
+
+    resume = Resume(
+        header=master_resume.header,
+        resume_content=resume_content
+    )
+
+    # Create fake job details for testing
+    job_details = JobDetails(
+        company_name="Test Company",
+        job_title="Software Engineer",
+        location="Remote",
+        job_id="TEST123",
+        job_description="This is a test job description for testing the Word document generation.",
+        date_applied="10-01-2025"
+    )
+
+    # Generate the Word document
+    output_path = generate_word_resume(resume, job_details)
+    print(f"Resume generated successfully: {output_path}")
