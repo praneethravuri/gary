@@ -1,163 +1,193 @@
 job_analysis_task:
-    description: >
-        Analyze the job description and extract all skills, requirements, and company signals for ATS optimization.
+  description: >
+    Analyze the job description and extract all skills, requirements, and company signals for ATS optimization.
 
-        Job Description:
-        ```
-        {job_description}
-        ```
+    **Extract and categorize:**
 
-        **Extract and categorize:**
+    Skills - Separate into technical (programming languages, tools, platforms, certifications), soft (communication, problem-solving),
+    management (leadership, stakeholder management, strategic planning), and bonus/nice-to-have qualifications.
+    Use exact terminology including abbreviations and version numbers.
 
-        Skills - Separate into technical (programming languages, tools, platforms, certifications), soft (communication, problem-solving),
-        management (leadership, stakeholder management, strategic planning), and bonus/nice-to-have qualifications.
-        Use exact terminology including abbreviations and version numbers.
+    Responsibilities & Qualifications - Extract complete phrases covering duties, requirements, and qualifications.
+    Strip buzzwords like "rockstar," "synergy," "disruptive" but preserve core meaning and industry-specific terminology.
+    Include quantifiable requirements (years of experience, education). Flag repeated or emphasized phrases as high priority.
 
-        Responsibilities & Qualifications - Extract complete phrases covering duties, requirements, and qualifications.
-        Strip buzzwords like "rockstar," "synergy," "disruptive" but preserve core meaning and industry-specific terminology.
-        Include quantifiable requirements (years of experience, education). Flag repeated or emphasized phrases as high priority.
+    Company Signals - Identify tone/priorities (fast-paced, collaborative, data-driven, innovative) and cultural values
+    (diversity, growth mindset, work-life balance, mission alignment). Exclude generic marketing language.
 
-        Company Signals - Identify tone/priorities (fast-paced, collaborative, data-driven, innovative) and cultural values
-        (diversity, growth mindset, work-life balance, mission alignment). Exclude generic marketing language.
+    **Quality standards:**
+    - Comprehensive: capture every substantive skill and requirement
+    - Precise: use exact terminology from job description
+    - Deduplicated: each item appears once across all categories
+    - Actionable: focus on concrete, verifiable qualifications over vague attributes
+        
+        
+    Job Description:
+    ```
+    {job_description}
+    ```
 
-        **Quality standards:**
-        - Comprehensive: capture every substantive skill and requirement
-        - Precise: use exact terminology from job description
-        - Deduplicated: each item appears once across all categories
-        - Actionable: focus on concrete, verifiable qualifications over vague attributes
-
-    expected_output: >
-        Complete JobAnalysis object with categorized extraction. No preamble or explanatory text.
+  expected_output: >
+    Complete JobAnalysis object with categorized extraction. No preamble or explanatory text.
 
 resume_tailoring_task:
-    description: >
-        Using the master resume and job analysis, strategically rewrite the resume to authentically align
-        with the target role. Create a polished, human-readable document that naturally integrates keywords
-        without sounding robotic or AI-generated.
+  description: >
+    **OBJECTIVE:** Transform the master resume into an ATS-optimized, culturally-aligned document that
+    authentically matches the target role. Use the rich JobAnalysis report to guide ALL tailoring decisions.
 
-        **Core Principles:**
+    **STEP 1 - DEEP ANALYSIS OF JOB ANALYSIS REPORT:**
+    Extract and prioritize keywords from ALL JobAnalysis fields, noting their purpose:
+    - `skills.technical` (must-have qualifications for Skills section)
+    - `skills.soft` (to be DEMONSTRATED through experience bullets, NOT listed)
+    - `skills.management` (to be SHOWN through leadership examples, NOT listed)
+    - `skills.bonus` (nice-to-have differentiators to include if possessed)
+    - `responsibilities_and_qualifications` (CRITICAL—repeated phrases are highest priority)
+    - `tone_and_priorities` (adapt writing style to match company character)
+    - `culture_and_values` (subtly reflect these in narrative)
 
-        **AUTHENTICITY (NON-NEGOTIABLE):**
-        - NEVER add any skill, experience, tool, technology, or qualification not explicitly present in the master resume.
-        - You may rephrase, emphasize, or contextualize existing content, but fabrication is strictly forbidden.
-        - When aligning with job requirements, adapt the candidate's genuine experience using relevant keywords—do not invent capabilities.
+    Map master resume experiences to these requirements and plan keyword distribution across sections:
+    Summary (strategic placement) > Recent role > Projects > Earlier roles > Education.
+    Target 50-70% natural keyword coverage from JobAnalysis.
 
-        **LANGUAGE & TONE:**
-        - Use implied first-person voice by eliminating all pronouns ("I," "me," "my," "we," "our") and starting bullets with action verbs.
-        - Use precise, action-oriented language. Words like "leveraged," "spearheaded," "utilizing" are acceptable when tied to specific, meaningful outcomes, but avoid overuse without context. Avoid corporate buzzwords (synergy, go-getter, disruptive, rockstar) that add no substance.
-        - Eliminate passive voice. Use strong, varied action verbs—prefer variety but allow natural repetition where appropriate.
-        - Vary sentence structures naturally—mix sentence lengths and starting patterns to avoid formulaic repetition.
-        - Write content that sounds genuinely human, as if crafted by a thoughtful professional, not generated by AI.
+    **STEP 2 - CRAFT PROFESSIONAL SUMMARY (50-80 words, 4-6 sentences):**
+    Structure: [Target job title + years of experience] → [2-3 expertise areas matching key responsibilities] → [quantified achievement]
 
-        **KEYWORD INTEGRATION:**
-        - Strategically weave keywords from the job analysis throughout the resume where they authentically fit the candidate's experience.
-        - Prioritize keyword placement: Professional Summary > Most Recent Role > Projects > Earlier Roles > Education.
-        - Use each critical keyword 1-3 times maximum across the entire resume to avoid stuffing.
-        - Never force keywords where they don't naturally align with the candidate's actual work.
+    - Calculate years from work history
+    - Highlight expertise areas matching high-priority items from `responsibilities_and_qualifications`
+    - Naturally weave 3-5 high-priority keywords (especially repeated phrases)
+    - Conclude with quantified achievement demonstrating relevant technical proficiency
+    - **REFLECT COMPANY CHARACTER:** Adapt tone to `tone_and_priorities` (e.g., dynamic language for "fast-paced," metrics for "data-driven," teamwork for "collaborative")
+    - **SUBTLE CULTURAL ALIGNMENT:** If authentic, incorporate 1-2 concepts from `culture_and_values` (e.g., mention innovation if valued)
+    - Write as cohesive, conversational paragraph (NOT bullet points, NO company names)
 
-        **Length Guidelines:**
-        - Professional Summary: Aim for 50-80 words for brevity and impact (4-6 sentences maximum)
-        - Work Experience bullets: Keep to 1-2 lines (approximately 15-30 words) for scannability—prioritize clarity over strict limits
-        - Project descriptions: 2-4 sentences maximum, focusing on problem-solution-impact
+    Example: "Software Engineer with 8+ years building scalable cloud infrastructure on AWS. Led development of microservices handling 50M+ daily requests, reducing latency by 40%. Passionate about rapid iteration and data-driven optimization."
 
-        **Section Guidelines:**
+    **STEP 3 - TAILOR WORK EXPERIENCE:**
 
-        **Professional Summary (50-80 words):**
-        IMPORTANT: The master resume does NOT contain a professional summary. You MUST generate it from scratch
-        by synthesizing information from:
-        - Job Analysis: responsibilities, qualifications, required skills, company tone/values
-        - Master Resume: work experience, skills, projects, education
+    **Role Title Handling (CRITICAL AUTHENTICITY RULE):**
+    - If most recent title is functionally similar but uses different terminology (e.g., "Software Developer" vs. "Software Engineer"), align it to target title
+    - NEVER change seniority level (e.g., "Engineer" → "Senior Engineer") or core function (e.g., "Data Analyst" → "Data Scientist")
+    - Keep ALL earlier titles unchanged
+    - If in doubt, keep original title and use bullets to emphasize relevant responsibilities
 
-        Write a concise, compelling 4-6 sentence summary that positions the candidate for this specific role.
-        Start with the target job title and years of experience (calculate from work history), highlight 2-3
-        areas of expertise aligned with key job responsibilities, and conclude with a quantified achievement
-        demonstrating relevant technical proficiency. Naturally integrate high-priority keywords from the job
-        analysis. Write as a cohesive, conversational paragraph. Do not mention the company name.
+    **Bullet Point Crafting:**
+    - Select 5 most relevant accomplishments per role from master resume
+    - Rewrite using STAR method: Action + Quantifiable Result/Impact
+    - Keep to 1-2 lines (15-30 words) for scannability, but prioritize clarity—allow slight extensions for complex achievements
+    - **DEMONSTRATE SOFT & MANAGEMENT SKILLS** through concrete examples:
+      * For collaboration: "Partnered with design and product teams of 12 to..."
+      * For mentorship: "Mentored 3 junior engineers, improving team code quality by 25%"
+      * For stakeholder management: "Presented technical roadmap to executive leadership"
+    - Use strong, varied action verbs: Technical (Architected, Built, Optimized); Leadership (Led, Managed, Mentored); Research (Analyzed, Investigated)
+    - Use "leveraged" or "spearheaded" ONLY sparingly and tied to specific measurable outcomes
+    - Vary sentence structures (action-first, result-first, time-based) for natural flow
+    - Include 1-2 metrics per bullet where measurable; emphasize scope/complexity if not quantifiable—don't force metrics
+    - Format metrics consistently (%, K, M)
+    - Integrate keywords from `skills.technical` and repeated phrases from `responsibilities_and_qualifications` naturally where they authentically fit
 
-        **Work Experience:**
-        - Update the most recent role's title to match the job analysis. Keep earlier titles unchanged.
-        - Select the 5 most relevant accomplishments from each role in the master resume.
-        - Keep bullets to 1-2 lines (approximately 15-30 words)—prioritize clarity over strict word limits.
-        - Use STAR method principles: clearly state the action taken and the quantifiable result or impact.
-        - Use strong, varied action verbs—prefer variety but allow natural repetition where appropriate.
-        - Include metrics where measurable (1-2 per bullet maximum); for non-quantifiable achievements, emphasize scope, complexity, and technical value. Format consistently (% for percentages, K/M for thousands/millions).
-        - Vary bullet structures—occasionally start with results ("Reduced costs 30% by..."), use time-based achievements ("In 6 months, achieved...").
-        - Distribute keyword integration across roles—prioritize critical responsibilities in the most recent position.
+    **STEP 4 - CURATE SKILLS:**
+    - Filter master resume skills to match `skills.technical` from JobAnalysis—remove unaligned items
+    - Organize into clear categories: Programming Languages, Frameworks, Databases, Cloud Platforms, Developer Tools, Methodologies
+    - List ONLY technical/hard skills (soft/management skills are demonstrated through experience bullets, NOT listed here)
+    - Use exact industry-standard names (JavaScript not Javascript, MySQL not Mysql)
+    - Avoid redundancy (don't list both "Python" and "Python 3.x")
+    - **BONUS SKILLS STRATEGY:** Review `skills.bonus` from JobAnalysis—if possessed, include these differentiators prominently in relevant categories
+    - **IMPLIED SKILLS RULE:** Add skills not in master resume ONLY if directly implied by existing projects/work
+      * ACCEPTABLE: Add "Python" if project used "Django"
+      * NOT ACCEPTABLE: Don't infer "Distributed Systems" from basic "AWS" usage
 
-        **Education:**
-        List up to 5 relevant courses per degree that directly relate to skills or responsibilities from the job analysis.
-        Use natural phrasing ("Relevant coursework includes..."). Omit unrelated coursework.
+    **STEP 5 - REFINE PROJECTS:**
+    - Write 2-4 sentence narratives using problem-solution-result structure
+    - Highlight technologies matching `skills.technical` from JobAnalysis
+    - Include measurable outcomes where available
+    - **USE PROJECTS TO SHOWCASE BONUS QUALIFICATIONS:** If `skills.bonus` contains technologies/skills not covered in work experience, feature them here
+    - Use projects to fill competency gaps not fully demonstrated in work experience
+    - Write conversationally with natural flow
 
-        **Projects:**
-        Write project descriptions (2-4 sentences each) in narrative style to highlight purpose, relevant technologies
-        from the job analysis, and measurable outcomes. Use projects to demonstrate competencies not fully covered in work
-        experience. Write conversationally, using problem-solution-result structure.
+    **STEP 6 - UPDATE EDUCATION:**
+    - List up to 5 relevant courses per degree directly relating to `skills.technical` or `responsibilities_and_qualifications`
+    - Use natural phrasing: "Relevant coursework includes..."
+    - Omit unrelated coursework
 
-        **Skills:**
-        - List only technical/hard skills and methodologies (soft skills should be demonstrated through work experience bullets, not listed in skills section).
-        - Select and prioritize relevant technical skills from the master resume, removing those not aligned with the target job.
-        - Organize into clear categories (Programming Languages, Frameworks, Databases, Cloud Platforms, Developer Tools, Methodologies).
-        - Include Developer Tools (Git, Docker, VS Code, etc.) and Methodologies (Agile, Scrum, CI/CD, etc.) in dedicated sub-categories to demonstrate modern development practices.
-        - Use industry-standard names. Avoid redundancy (don't list "Python" and "Python 3.x").
-        - DO NOT add technical skills from the job analysis unless they are genuinely implied or demonstrated by existing project/work experience in the master resume.
+    **STEP 7 - FINAL VALIDATION:**
+    Verify the resume fully aligns with ALL aspects of the JobAnalysis report:
+    - High-priority keywords (especially repeated phrases) naturally integrated
+    - Technical, soft, management, and bonus skills covered where applicable
+    - Tone and culture authentically reflected
+    - No fabrication or keyword stuffing (max 1-3 uses per critical keyword)
+    - Natural readability with varied sentence structures
+    - No pronouns (I, me, we), no passive voice, no AI patterns
+    - Consistent tense (past for previous roles, present for current), capitalization, and metric formatting
 
-        **Master Resume:**
-        ```json
-        {master_resume}
-    expected_output: >
-        A single, clean JSON object that strictly adheres to the `Resume` Pydantic model.
-        Do not include any introductory text, explanations, or any content outside of the final JSON object.
+    **CRITICAL AUTHENTICITY & QUALITY RULES:**
+    - NEVER fabricate or add anything not in master resume (skills, experiences, titles)
+    - NEVER change seniority or core function in job titles
+    - NEVER keyword stuff—integrate naturally across sections
+    - NEVER use robotic patterns (avoid overused phrases without context like "synergy," excessive "leveraged")
+    - DO rephrase and strategically emphasize existing content authentically
+    - DO vary sentence structures and lengths for conversational professionalism
+    - DO integrate keywords naturally, targeting 50-70% coverage
+    - DO demonstrate soft/management skills through examples, not lists
+
+    **Master Resume:**
+    ```
+    {master_resume}
+    ```
+
+  expected_output: >
+    A single, clean JSON object that strictly adheres to the `ResumeContent` Pydantic model.
+    Do not include any introductory text, explanations, or any content outside of the final JSON object.
 
 resume_validation_task:
-    description: >
-        Validate the tailored resume against the job analysis to ensure quality, keyword integration,
-        and readiness for document generation. Use the context from previous tasks (job analysis and
-        tailored resume) to perform comprehensive analysis and provide actionable feedback.
+  description: >
+    Validate the tailored resume against the job analysis to ensure quality, keyword integration,
+    and readiness for document generation. Use the context from previous tasks (job analysis and
+    tailored resume) to perform comprehensive analysis and provide actionable feedback.
 
-        **Validation Criteria:**
+    **Validation Criteria:**
 
-        **1. Keyword Integration Analysis:**
-        - Count total keywords from job analysis (technical skills, soft skills, management skills, and key terms)
-        - Identify which keywords appear in the resume
-        - Calculate integration rate (percentage of keywords included)
-        - Classify keywords as naturally integrated vs. forced/awkwardly placed
-        - Identify missing critical keywords that should be added
-        - Check for keyword stuffing (same keyword repeated excessively)
+    **1. Keyword Integration Analysis:**
+    - Count total keywords from job analysis (technical skills, soft skills, management skills, and key terms)
+    - Identify which keywords appear in the resume
+    - Calculate integration rate (percentage of keywords included)
+    - Classify keywords as naturally integrated vs. forced/awkwardly placed
+    - Identify missing critical keywords that should be added
+    - Check for keyword stuffing (same keyword repeated excessively)
 
-        **2. Phrase Usage Analysis:**
-        - Verify that responsibilities and qualifications from job analysis are reflected in resume
-        - Check if industry-specific terminology is used correctly and in proper context
-        - Identify phrases that sound unnatural or AI-generated ("leveraged," "spearheaded," "synergy")
-        - Note important phrases from job description that should be incorporated
+    **2. Phrase Usage Analysis:**
+    - Verify that responsibilities and qualifications from job analysis are reflected in resume
+    - Check if industry-specific terminology is used correctly and in proper context
+    - Identify phrases that sound unnatural or AI-generated ("leveraged," "spearheaded," "synergy")
+    - Note important phrases from job description that should be incorporated
 
-        **3. ATS Compatibility Check:**
-        - Evaluate keyword density and distribution across resume sections
-        - Verify technical skills are explicitly stated (not just implied)
-        - Check if quantifiable achievements are present
-        - Assess overall structure and formatting compatibility
-        - Score from 0-100 based on ATS optimization
+    **3. ATS Compatibility Check:**
+    - Evaluate keyword density and distribution across resume sections
+    - Verify technical skills are explicitly stated (not just implied)
+    - Check if quantifiable achievements are present
+    - Assess overall structure and formatting compatibility
+    - Score from 0-100 based on ATS optimization
 
-        **4. Human Readability Assessment:**
-        - Evaluate natural language flow and sentence variety
-        - Identify robotic patterns or AI-generated phrases
-        - Check for authentic voice and third-person consistency
-        - Assess if experience sounds genuine vs. fabricated
-        - Score from 0-100 based on human readability
+    **4. Human Readability Assessment:**
+    - Evaluate natural language flow and sentence variety
+    - Identify robotic patterns or AI-generated phrases
+    - Check for authentic voice and third-person consistency
+    - Assess if experience sounds genuine vs. fabricated
+    - Score from 0-100 based on human readability
 
-        **5. Quality Feedback:**
-        - List 3-5 specific strengths of the resume
-        - List 3-5 weaknesses or areas for improvement
-        - Provide 3-5 actionable suggestions for enhancement
-        - Calculate overall score (weighted: 40% keyword integration, 30% ATS score, 30% readability)
+    **5. Quality Feedback:**
+    - List 3-5 specific strengths of the resume
+    - List 3-5 weaknesses or areas for improvement
+    - Provide 3-5 actionable suggestions for enhancement
+    - Calculate overall score (weighted: 40% keyword integration, 30% ATS score, 30% readability)
 
-        **6. Pass/Fail Determination:**
-        - Resume passes if: overall score >= 75, ATS score >= 70, readability score >= 70, integration rate >= 60%
-        - Resume is ready for generation if: passed_validation = True AND no critical keywords missing
+    **6. Pass/Fail Determination:**
+    - Resume passes if: overall score >= 75, ATS score >= 70, readability score >= 70, integration rate >= 60%
+    - Resume is ready for generation if: passed_validation = True AND no critical keywords missing
 
-        **Note:** Do NOT use the document generation tool. The validation report will be used by the main
-        workflow to generate the document. Focus only on validation and providing the comprehensive report.
+    **Note:** Do NOT use the document generation tool. The validation report will be used by the main
+    workflow to generate the document. Focus only on validation and providing the comprehensive report.
 
-    expected_output: >
-        A comprehensive ResumeValidationReport JSON object that includes all analysis, scores, feedback,
-        and pass/fail determination based on the job analysis and tailored resume from previous tasks.
-        Do not include any preamble or extra text outside of the JSON object.
+  expected_output: >
+    A comprehensive ResumeValidationReport JSON object that includes all analysis, scores, feedback,
+    and pass/fail determination based on the job analysis and tailored resume from previous tasks.
+    Do not include any preamble or extra text outside of the JSON object.
