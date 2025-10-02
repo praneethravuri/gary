@@ -1,54 +1,477 @@
-# Gary Crew
+# Gary - AI-Powered Resume Tailoring System
 
-Welcome to the Gary Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+An intelligent resume tailoring system powered by CrewAI that analyzes job descriptions and automatically customizes your resume to match specific job requirements while maintaining authenticity and readability.
 
-## Installation
+## Motivation
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+Job applications require tailored resumes that highlight relevant skills and experiences for each position. Manually customizing resumes for every application is time-consuming and inconsistent. Gary automates this process using AI agents that:
 
-First, if you haven't already, install uv:
+- Analyze job descriptions to extract key requirements, skills, and company culture indicators
+- Tailor your master resume to emphasize relevant experience and integrate important keywords naturally
+- Validate the tailored resume for ATS compatibility and human readability
+- Generate professional Word documents ready for submission
+- Track all applications in Google Sheets for easy management
+
+## Features
+
+- **Multi-Agent AI System**: Three specialized agents working sequentially
+  - **Job Analyst**: Extracts skills, responsibilities, qualifications, tone, and cultural values from job descriptions
+  - **Resume Tailor**: Customizes resume content to align with job requirements while maintaining authenticity
+  - **Resume Validator**: Scores keyword integration, ATS compatibility, and readability before final generation
+
+- **Intelligent Resume Customization**: Naturally integrates job-specific keywords and phrases without sounding robotic
+
+- **ATS Optimization**: Ensures resumes pass Applicant Tracking Systems while remaining human-readable
+
+- **Automated Document Generation**: Creates formatted Word documents using customizable templates
+
+- **Application Tracking**: Logs all job applications to Google Sheets with job details and application dates
+
+- **Comprehensive Validation**: Provides detailed feedback on resume quality with actionable suggestions
+
+## Project Structure
+
+```
+gary/
+├── data/
+│   └── resume.json              # Your master resume data
+├── templates/
+│   └── resume_word_template.docx # Word document template
+├── resumes/                     # Generated resume documents (output)
+├── src/
+│   └── gary/
+│       ├── config/
+│       │   ├── agents.yaml      # Agent configurations
+│       │   └── tasks.yaml       # Task definitions
+│       ├── tools/
+│       │   └── resume_word_doc_tool.py
+│       ├── utils/
+│       │   ├── clean_job_description.py
+│       │   ├── google_sheets.py
+│       │   ├── read_json.py
+│       │   ├── result_parser.py
+│       │   └── resume_word_doc_generator.py
+│       ├── config.py            # Path configurations
+│       ├── crew.py              # CrewAI agent & task definitions
+│       ├── exceptions.py        # Custom exceptions
+│       ├── main.py              # Entry point
+│       └── models.py            # Pydantic data models
+├── .env                         # Environment variables
+├── googleSheetsCredentials.json # Google service account credentials
+├── pyproject.toml               # Project dependencies
+└── README.md
+```
+
+## Setup Instructions
+
+### 1. Prerequisites
+
+- Python >= 3.10, < 3.14
+- [uv](https://docs.astral.sh/uv/) package manager (recommended) or pip
+
+### 2. Installation
+
+Install uv if you haven't already:
 
 ```bash
 pip install uv
 ```
 
-Next, navigate to your project directory and install the dependencies:
+Clone the repository and install dependencies:
 
-(Optional) Lock the dependencies and install them by using the CLI command:
 ```bash
+cd gary
 crewai install
 ```
-### Customizing
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
-
-- Modify `src/gary/config/agents.yaml` to define your agents
-- Modify `src/gary/config/tasks.yaml` to define your tasks
-- Modify `src/gary/crew.py` to add your own logic, tools and specific args
-- Modify `src/gary/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project
-
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
+Or using uv directly:
 
 ```bash
-$ crewai run
+uv sync
 ```
 
-This command initializes the gary Crew, assembling the agents and assigning them tasks as defined in your configuration.
+### 3. Configure Environment Variables
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+Create a `.env` file in the project root with the following structure:
 
-## Understanding Your Crew
+```env
+# OpenRouter API Configuration (or use OpenAI directly)
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 
-The gary Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+# Google Sheets Configuration
+GOOGLE_SHEETS_ID=your_google_sheets_id_here
+```
 
-## Support
+**How to get these values:**
 
-For support, questions, or feedback regarding the Gary Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+- **OPENROUTER_API_KEY**: Sign up at [OpenRouter](https://openrouter.ai/) and generate an API key
+  - Or use OpenAI directly by modifying `crew.py` to use OpenAI's API
+- **GOOGLE_SHEETS_ID**: Found in your Google Sheets URL: `https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit`
 
-Let's create wonders together with the power and simplicity of crewAI.
+### 4. Setup Google Sheets Integration
+
+#### Create a Google Cloud Service Account
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable the **Google Sheets API**:
+   - Navigate to "APIs & Services" > "Library"
+   - Search for "Google Sheets API"
+   - Click "Enable"
+4. Create a service account:
+   - Go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "Service Account"
+   - Fill in service account details and click "Create"
+   - Skip optional permissions and click "Done"
+5. Generate credentials JSON:
+   - Click on the created service account
+   - Go to the "Keys" tab
+   - Click "Add Key" > "Create New Key"
+   - Select "JSON" and click "Create"
+   - Download the JSON file
+
+#### Configure Credentials
+
+1. Rename the downloaded JSON file to `googleSheetsCredentials.json`
+2. Place it in the project root directory
+3. The file should have this structure:
+
+```json
+{
+  "type": "service_account",
+  "project_id": "your-project-id",
+  "private_key_id": "key-id",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+  "client_email": "your-service-account@your-project.iam.gserviceaccount.com",
+  "client_id": "client-id",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "cert-url"
+}
+```
+
+#### Setup Google Sheets
+
+1. Create a new Google Sheet or use an existing one
+2. Share the sheet with the service account email (found in `client_email` in the JSON file)
+   - Give it "Editor" permissions
+3. Copy the Sheet ID from the URL and add it to your `.env` file
+
+The Google Sheet should have the following columns (or will be populated automatically):
+- Date Applied
+- Company Name
+- Job Title
+- Location
+- Job ID
+- Job Description
+- Status
+
+### 5. Setup Resume Data
+
+Create your master resume in `data/resume.json` following this structure:
+
+```json
+{
+  "header": {
+    "name": "Your Full Name",
+    "phone": "+1 (XXX) XXX-XXXX",
+    "email": "your.email@example.com",
+    "location": "City, State, Country",
+    "links": [
+      {
+        "platform": "GitHub",
+        "url": "https://github.com/yourusername"
+      },
+      {
+        "platform": "LinkedIn",
+        "url": "https://linkedin.com/in/yourusername"
+      },
+      {
+        "platform": "Portfolio",
+        "url": "https://yourportfolio.com"
+      }
+    ]
+  },
+  "professional_summary": {
+    "summary": "Your professional summary highlighting your experience, skills, and expertise. This will be customized per job application."
+  },
+  "work_experience": [
+    {
+      "title": "Job Title",
+      "company": "Company Name",
+      "startDate": "Month Year",
+      "endDate": "Present",
+      "responsibilities": [
+        "Detailed accomplishment or responsibility with metrics",
+        "Another achievement with quantifiable results",
+        "Technical contribution with specific technologies and impact"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "category": "Programming Languages",
+      "items": ["Python", "JavaScript", "Go"]
+    },
+    {
+      "category": "Frameworks & Libraries",
+      "items": ["React", "FastAPI", "Node.js"]
+    },
+    {
+      "category": "Databases",
+      "items": ["PostgreSQL", "MongoDB", "Redis"]
+    },
+    {
+      "category": "Cloud Technologies",
+      "items": ["AWS", "GCP"]
+    },
+    {
+      "category": "Developer Tools",
+      "items": ["Docker", "Kubernetes", "Git"]
+    }
+  ],
+  "education": [
+    {
+      "degree": "Degree Name, Major",
+      "institution": "University Name",
+      "startDate": "Month Year",
+      "endDate": "Month Year",
+      "coursework": ["Relevant Course 1", "Relevant Course 2"]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Project Name",
+      "description": "Detailed project description highlighting technologies used, problem solved, and impact/results."
+    }
+  ]
+}
+```
+
+**Important Notes:**
+- Include as much detail as possible in your master resume
+- Use specific metrics and achievements
+- The AI will select and emphasize the most relevant parts for each job
+- The `location` in the header will be automatically updated to match the job location
+
+### 6. Customize Word Template (Optional)
+
+The Word document template is located at `templates/resume_word_template.docx`. This template uses Jinja2 syntax for variable substitution.
+
+**Available variables:**
+- `{{ header.name }}`
+- `{{ header.email }}`
+- `{{ header.phone }}`
+- `{{ header.location }}`
+- `{{ header.links }}` (array)
+- `{{ resume_content.professional_summary.summary }}`
+- `{{ resume_content.work_experience }}` (array)
+- `{{ resume_content.education }}` (array)
+- `{{ resume_content.skills }}` (array)
+- `{{ resume_content.projects }}` (array)
+
+You can edit the template in Microsoft Word while preserving the Jinja2 placeholders to customize formatting, fonts, colors, and layout.
+
+## How It Works
+
+### Resume Generation Flow
+
+1. **Input Collection**: The system prompts you for job details via CLI:
+   - Company name
+   - Job title
+   - Location
+   - Job ID (optional)
+   - Job description (paste multi-line, type 'END' to finish)
+
+2. **Job Analysis**: The Job Analyst agent:
+   - Extracts technical, soft, and management skills
+   - Identifies key responsibilities and qualifications
+   - Analyzes company tone and cultural values
+   - Returns structured job analysis
+
+3. **Resume Tailoring**: The Resume Tailor agent:
+   - Customizes professional summary for the specific role
+   - Emphasizes relevant work experiences
+   - Integrates keywords naturally into responsibilities
+   - Selects most applicable skills and projects
+   - Returns tailored resume content
+
+4. **Validation**: The Resume Validator agent:
+   - Analyzes keyword integration rate
+   - Scores ATS compatibility (0-100)
+   - Scores human readability (0-100)
+   - Identifies strengths, weaknesses, and provides suggestions
+   - Returns validation report with overall score
+
+5. **Document Generation**:
+   - Combines tailored content with your header info
+   - Updates location to match job location
+   - Renders Word document from template
+   - Saves to `resumes/` directory with naming: `{name}_{company}_{job_title}_{job_id}.docx`
+
+6. **Application Tracking**:
+   - Logs job details to Google Sheets
+   - Records date applied, company, title, location, and status
+
+### AI Agents
+
+The system uses three specialized CrewAI agents:
+
+| Agent | Model | Role | Temperature |
+|-------|-------|------|-------------|
+| **Job Analyst** | Gemini 2.5 Flash | Extract structured insights from job descriptions | 0.2 (precise) |
+| **Resume Tailor** | Claude Sonnet 4 | Customize resume content naturally and strategically | 0.4 (balanced) |
+| **Resume Validator** | Gemini 2.5 Flash | Validate quality, ATS compatibility, readability | 0.2 (precise) |
+
+## Usage
+
+### Running the Application
+
+From the project root directory:
+
+```bash
+crewai run
+```
+
+Or using the installed script:
+
+```bash
+gary
+```
+
+Or using Python directly:
+
+```bash
+python -m gary.main
+```
+
+### Example Workflow
+
+```
+$ crewai run
+
+================================================================================
+JOB DETAILS INPUT
+================================================================================
+Company Name: TechCorp
+Job Title: Senior Software Engineer
+Location: San Francisco, CA
+Job ID (optional, press Enter to skip): ENG-2024-123
+
+Job Description (paste below, then type 'END' on a new line and press Enter):
+We are seeking a Senior Software Engineer with expertise in Python and cloud technologies...
+[paste full job description]
+END
+
+✓ Job details collected for TechCorp - Senior Software Engineer (Applied: 10-02-2025)
+
+[Agent execution logs...]
+
+================================================================================
+RESUME VALIDATION REPORT
+================================================================================
+Passed Validation: True
+Overall Score: 92/100
+Ready for Generation: True
+
+Keyword Integration Rate: 87.5%
+Keywords Integrated: 35/40
+ATS Score: 94/100
+Human Readability Score: 90/100
+
+Strengths:
+  ✓ Natural integration of technical keywords
+  ✓ Strong quantifiable achievements
+  ✓ Well-aligned with job requirements
+
+Weaknesses:
+  ✗ Missing mention of specific AWS services mentioned in job description
+
+Suggestions:
+  → Consider adding specific AWS service experience if applicable
+
+================================================================================
+GENERATING WORD DOCUMENT
+================================================================================
+✓ Resume generated successfully: C:\projects\gary\resumes\john_doe_TechCorp_Senior_Software_Engineer_ENG-2024-123.docx
+
+✓ Job details logged to Google Sheets
+```
+
+### Output
+
+- **Word Document**: Professional resume saved in `resumes/` directory
+- **Google Sheets**: Job application logged automatically
+- **Validation Report**: Detailed feedback displayed in terminal
+- **Logs**: Execution logs saved in `logs.txt`
+
+## Customization
+
+### Modifying Agent Behavior
+
+Edit agent configurations in `src/gary/config/agents.yaml`:
+- Adjust agent roles, goals, and backstories
+- Modify agent instructions and constraints
+
+### Modifying Task Instructions
+
+Edit task configurations in `src/gary/config/tasks.yaml`:
+- Customize task descriptions and expected outputs
+- Adjust validation criteria and scoring
+
+### Changing AI Models
+
+Edit `src/gary/crew.py` to change models:
+
+```python
+llm=llm_config("openrouter/google/gemini-2.5-flash", 0.2)
+```
+
+Available models (via OpenRouter):
+- `openrouter/anthropic/claude-sonnet-4`
+- `openrouter/google/gemini-2.5-flash`
+- `openrouter/openai/gpt-4`
+- Many more at [OpenRouter Models](https://openrouter.ai/models)
+
+## Troubleshooting
+
+### Google Sheets Authentication Errors
+
+- Verify `googleSheetsCredentials.json` is in the project root
+- Ensure the service account email has Editor access to the sheet
+- Check that `GOOGLE_SHEETS_ID` in `.env` matches your sheet URL
+
+### Template Rendering Issues
+
+- Verify `templates/resume_word_template.docx` exists
+- Ensure Jinja2 placeholders in template match model fields
+- Test template with sample data
+
+### API Rate Limiting
+
+- OpenRouter has rate limits; consider upgrading plan for heavy usage
+- Adjust `max_iter` in agent configurations to reduce API calls
+
+### Resume Generation Fails
+
+- Check that `data/resume.json` follows the exact schema
+- Validate JSON syntax using a JSON validator
+- Ensure all required fields are present
+
+## License
+
+This project is open source and available for personal and commercial use.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
+
+## Credits
+
+Built with:
+- [CrewAI](https://crewai.com) - Multi-agent AI framework
+- [OpenRouter](https://openrouter.ai/) - Unified LLM API
+- [python-docx-template](https://github.com/elapouya/python-docx-template) - Word document templating
+- [gspread](https://github.com/burnash/gspread) - Google Sheets integration
