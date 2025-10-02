@@ -169,14 +169,29 @@ GOOGLE_SHEETS_ID=your_google_sheets_id_here
    - Give it "Editor" permissions
 3. Copy the Sheet ID from the URL and add it to your `.env` file
 
-The Google Sheet should have the following columns (or will be populated automatically):
-- Date Applied
-- Company Name
-- Job Title
-- Location
-- Job ID
-- Job Description
-- Status
+### Google Sheets Tracker
+
+After generating each resume, the system automatically logs the job application to Google Sheets. The following fields from the `JobDetails` model are written:
+
+| Field | Source | Description | Example |
+|-------|--------|-------------|---------|
+| **Date Applied** | `job_details.date_applied` | Auto-generated current date in MM-DD-YYYY format | 10-02-2025 |
+| **Company Name** | `job_details.company_name` | Company hiring for the position | TechCorp |
+| **Job Title** | `job_details.job_title` | Position title | Senior Software Engineer |
+| **Location** | `job_details.location` | Job location | San Francisco, CA |
+| **Job ID** | `job_details.job_id` | Optional job identifier (empty if not provided) | ENG-2024-123 |
+| **Job Description** | `job_details.job_description` | Full cleaned job description text | We are seeking a Senior... |
+| **Status** | Hardcoded | Application status | Done |
+
+**Example Google Sheet:**
+
+| Date Applied | Company Name | Job Title | Location | Job ID | Job Description | Status |
+|-------------|--------------|-----------|----------|--------|-----------------|--------|
+| 10-02-2025 | TechCorp | Senior Software Engineer | San Francisco, CA | ENG-2024-123 | We are seeking a Senior Software Engineer with expertise in Python and cloud technologies... | Done |
+| 09-28-2025 | StartupXYZ | Full Stack Developer | Remote | | Looking for a Full Stack Developer proficient in React and Node.js... | Done |
+| 09-25-2025 | BigCorp | DevOps Engineer | New York, NY | DEV-456 | Join our DevOps team to build scalable infrastructure... | Done |
+
+The sheet will be populated automatically - you don't need to create the columns manually
 
 ### 5. Setup Resume Data
 
