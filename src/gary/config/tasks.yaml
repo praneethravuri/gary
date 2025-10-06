@@ -32,102 +32,55 @@ job_analysis_task:
 
 resume_tailoring_task:
   description: >
-    **OBJECTIVE:** Transform the master resume into an ATS-optimized, culturally-aligned document that
-    authentically matches the target role. Use the rich JobAnalysis report to guide ALL tailoring decisions.
+    Transform master resume into ATS-optimized document that authentically matches target role using JobAnalysis report.
 
-    **STEP 1 - DEEP ANALYSIS OF JOB ANALYSIS REPORT:**
-    Extract and prioritize keywords from ALL JobAnalysis fields, noting their purpose:
-    - `skills.technical` (must-have qualifications for Skills section)
-    - `skills.soft` (to be DEMONSTRATED through experience bullets, NOT listed)
-    - `skills.management` (to be SHOWN through leadership examples, NOT listed)
-    - `skills.bonus` (nice-to-have differentiators to include if possessed)
-    - `responsibilities_and_qualifications` (CRITICAL—repeated phrases are highest priority)
-    - `tone_and_priorities` (adapt writing style to match company character)
-    - `culture_and_values` (subtly reflect these in narrative)
+    **INPUT VALIDATION:**
+    - Verify JobAnalysis contains: skills (technical/soft/management/bonus), responsibilities_and_qualifications, tone_and_priorities
+    - Confirm master resume has: work experience (titles/dates/bullets), skills, education
+    - Calculate skill overlap: If <30% match between master resume skills and JobAnalysis technical skills, STOP and output:
+      {"error": "fundamental_mismatch", "overlap_percentage": X, "message": "Insufficient alignment between candidate background and role requirements"}
 
-    Map master resume experiences to these requirements and plan keyword distribution across sections:
-    Summary (strategic placement) > Recent role > Projects > Earlier roles > Education.
-    Target 50-70% natural keyword coverage from JobAnalysis.
+    **CORE PRINCIPLES (Apply to ALL steps):**
+    1. **AUTHENTICITY** - Never fabricate skills/experience not in master resume. Never change seniority level (Junior→Senior) or core function (Analyst→Scientist).
+    2. **KEYWORD OPTIMIZATION** - Target 50-70% coverage from JobAnalysis. Prioritize keyword placement: Summary > Recent Role > Projects > Earlier Roles. Max 3 uses per keyword.
+    3. **NATURAL LANGUAGE** - Vary sentence structures. Avoid AI patterns: "leveraged/spearheaded" (unless tied to specific metrics), "synergy", robotic repetition.
+    4. **DEMONSTRATION** - Show soft/management skills through examples, NEVER list them. Technical skills only in Skills section.
+    5. **RECENCY** - Focus 70% content on last 5 years of experience. Condense older roles to 2-3 bullets max.
 
-    **STEP 2 - CRAFT PROFESSIONAL SUMMARY (50-80 words, 4-6 sentences):**
-    Structure: [Target job title + years of experience] → [2-3 expertise areas matching key responsibilities] → [quantified achievement]
+    **STEP 1 - KEYWORD ANALYSIS & MAPPING:**
+    Extract from JobAnalysis: `skills.technical` (Skills section), `skills.soft` (demonstrate in bullets), `skills.management` (show through leadership examples),
+    `skills.bonus` (differentiators if possessed), `responsibilities_and_qualifications` (repeated phrases = highest priority). Map authentic master resume experiences to requirements.
 
-    - Calculate years from work history
-    - Highlight expertise areas matching high-priority items from `responsibilities_and_qualifications`
-    - Naturally weave 3-5 high-priority keywords (especially repeated phrases)
-    - Conclude with quantified achievement demonstrating relevant technical proficiency
-    - **REFLECT COMPANY CHARACTER:** Adapt tone to `tone_and_priorities` (e.g., dynamic language for "fast-paced," metrics for "data-driven," teamwork for "collaborative")
-    - **SUBTLE CULTURAL ALIGNMENT:** If authentic, incorporate 1-2 concepts from `culture_and_values` (e.g., mention innovation if valued)
-    - Write as cohesive, conversational paragraph (NOT bullet points, NO company names)
+    **STEP 2 - PROFESSIONAL SUMMARY (50-80 words):**
+    Structure: [Job title + years] → [2-3 expertise areas] → [quantified achievement]. Weave 3-5 high-priority keywords naturally.
+    Adapt tone to JobAnalysis: Fast-paced → dynamic verbs; Data-driven → metrics-heavy; Collaborative → team language; Innovative → new solutions.
+    Example: "Software Engineer with 8+ years building scalable AWS infrastructure. Led microservices handling 50M+ daily requests, reducing latency 40%."
 
-    Example: "Software Engineer with 8+ years building scalable cloud infrastructure on AWS. Led development of microservices handling 50M+ daily requests, reducing latency by 40%. Passionate about rapid iteration and data-driven optimization."
+    **STEP 3 - WORK EXPERIENCE:**
 
-    **STEP 3 - TAILOR WORK EXPERIENCE:**
+    **Title Handling:** Align most recent title ONLY if functionally identical (Developer<-->Engineer OK, Analyst<-->Scientist NOT OK). When unclear, keep original and emphasize relevant duties in bullets.
 
-    **Role Title Handling (CRITICAL AUTHENTICITY RULE):**
-    - If most recent title is functionally similar but uses different terminology (e.g., "Software Developer" vs. "Software Engineer"), align it to target title
-    - NEVER change seniority level (e.g., "Engineer" → "Senior Engineer") or core function (e.g., "Data Analyst" → "Data Scientist")
-    - Keep ALL earlier titles unchanged
-    - If in doubt, keep original title and use bullets to emphasize relevant responsibilities
+    **Bullets (5-6 for recent roles, 2-3 for older roles per RECENCY principle):**
+    - **Review ALL master resume bullets** for each role. Select most relevant content—combine related achievements to preserve impactful details without losing key information.
+    - STAR format: Action + Quantifiable Result (15-30 words, max 35 for complex achievements)
+    - **Include metrics where authentic** (1-2 per bullet max). Use %, K, M format consistently. No metrics? Emphasize scope, complexity, or technical depth instead.
+    - Examples: Collaboration = "Partnered with X team of N..."; Mentorship = "Mentored N engineers, improving Y by Z%"; Leadership = "Led initiative resulting in..."
+    - Vary action verbs: Technical (Architected, Built, Optimized); Leadership (Led, Mentored); Analysis (Investigated, Analyzed)
+    - Integrate keywords from `skills.technical` and repeated phrases from `responsibilities_and_qualifications` naturally where authentic fit exists
 
-    **Bullet Point Crafting:**
-    - Select 5 most relevant accomplishments per role from master resume
-    - Rewrite using STAR method: Action + Quantifiable Result/Impact
-    - Keep to 1-2 lines (15-30 words) for scannability, but prioritize clarity—allow slight extensions for complex achievements
-    - **DEMONSTRATE SOFT & MANAGEMENT SKILLS** through concrete examples:
-      * For collaboration: "Partnered with design and product teams of 12 to..."
-      * For mentorship: "Mentored 3 junior engineers, improving team code quality by 25%"
-      * For stakeholder management: "Presented technical roadmap to executive leadership"
-    - Use strong, varied action verbs: Technical (Architected, Built, Optimized); Leadership (Led, Managed, Mentored); Research (Analyzed, Investigated)
-    - Use "leveraged" or "spearheaded" ONLY sparingly and tied to specific measurable outcomes
-    - Vary sentence structures (action-first, result-first, time-based) for natural flow
-    - Include 1-2 metrics per bullet where measurable; emphasize scope/complexity if not quantifiable—don't force metrics
-    - Format metrics consistently (%, K, M)
-    - Integrate keywords from `skills.technical` and repeated phrases from `responsibilities_and_qualifications` naturally where they authentically fit
+    **STEP 4 - SKILLS:**
+    Filter master skills to match `skills.technical`. Organize: Programming Languages | Frameworks | Databases | Cloud Platforms | Developer Tools | Methodologies.
+    Use exact names (JavaScript not Javascript). Include `skills.bonus` if possessed.
+    **Implied Skills Rule:** Add ONLY if technological prerequisite (Django→Python OK; AWS→Distributed Systems NOT OK).
 
-    **STEP 4 - CURATE SKILLS:**
-    - Filter master resume skills to match `skills.technical` from JobAnalysis—remove unaligned items
-    - Organize into clear categories: Programming Languages, Frameworks, Databases, Cloud Platforms, Developer Tools, Methodologies
-    - List ONLY technical/hard skills (soft/management skills are demonstrated through experience bullets, NOT listed here)
-    - Use exact industry-standard names (JavaScript not Javascript, MySQL not Mysql)
-    - Avoid redundancy (don't list both "Python" and "Python 3.x")
-    - **BONUS SKILLS STRATEGY:** Review `skills.bonus` from JobAnalysis—if possessed, include these differentiators prominently in relevant categories
-    - **IMPLIED SKILLS RULE:** Add skills not in master resume ONLY if directly implied by existing projects/work
-      * ACCEPTABLE: Add "Python" if project used "Django"
-      * NOT ACCEPTABLE: Don't infer "Distributed Systems" from basic "AWS" usage
+    **STEP 5 - PROJECTS:**
+    2-4 sentences: Problem → Solution → Result. Feature `skills.bonus` technologies not covered in work experience. Include metrics if available.
 
-    **STEP 5 - REFINE PROJECTS:**
-    - Write 2-4 sentence narratives using problem-solution-result structure
-    - Highlight technologies matching `skills.technical` from JobAnalysis
-    - Include measurable outcomes where available
-    - **USE PROJECTS TO SHOWCASE BONUS QUALIFICATIONS:** If `skills.bonus` contains technologies/skills not covered in work experience, feature them here
-    - Use projects to fill competency gaps not fully demonstrated in work experience
-    - Write conversationally with natural flow
+    **STEP 6 - EDUCATION:**
+    List up to 5 courses matching `skills.technical` or `responsibilities_and_qualifications`. Use natural phrasing: "Relevant coursework includes..."
 
-    **STEP 6 - UPDATE EDUCATION:**
-    - List up to 5 relevant courses per degree directly relating to `skills.technical` or `responsibilities_and_qualifications`
-    - Use natural phrasing: "Relevant coursework includes..."
-    - Omit unrelated coursework
-
-    **STEP 7 - FINAL VALIDATION:**
-    Verify the resume fully aligns with ALL aspects of the JobAnalysis report:
-    - High-priority keywords (especially repeated phrases) naturally integrated
-    - Technical, soft, management, and bonus skills covered where applicable
-    - Tone and culture authentically reflected
-    - No fabrication or keyword stuffing (max 1-3 uses per critical keyword)
-    - Natural readability with varied sentence structures
-    - No pronouns (I, me, we), no passive voice, no AI patterns
-    - Consistent tense (past for previous roles, present for current), capitalization, and metric formatting
-
-    **CRITICAL AUTHENTICITY & QUALITY RULES:**
-    - NEVER fabricate or add anything not in master resume (skills, experiences, titles)
-    - NEVER change seniority or core function in job titles
-    - NEVER keyword stuff—integrate naturally across sections
-    - NEVER use robotic patterns (avoid overused phrases without context like "synergy," excessive "leveraged")
-    - DO rephrase and strategically emphasize existing content authentically
-    - DO vary sentence structures and lengths for conversational professionalism
-    - DO integrate keywords naturally, targeting 50-70% coverage
-    - DO demonstrate soft/management skills through examples, not lists
+    **STEP 7 - SELF-CHECK:**
+    Verify adherence to CORE PRINCIPLES and keyword distribution targets. Confirm: no pronouns (I/me/we), consistent tense (past for previous/present for current).
 
     **Master Resume:**
     ```
@@ -135,8 +88,7 @@ resume_tailoring_task:
     ```
 
   expected_output: >
-    A single, clean JSON object that strictly adheres to the `ResumeContent` Pydantic model.
-    Do not include any introductory text, explanations, or any content outside of the final JSON object.
+    Single JSON object adhering to `ResumeContent` Pydantic model. NO preamble, explanations, or markdown formatting—JSON only.
 
 resume_validation_task:
   description: >
